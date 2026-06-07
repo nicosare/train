@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<title>Street Revival — Программа возврата</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdn.jsdelivr.net/fontsource/css/inter@latest/index.css" rel="stylesheet">
+<style>
+  * { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+  html, body { overscroll-behavior: none; }
+  body {
+    background: #0a0e1a;
+    color: #e8ecf5;
+    padding-bottom: 86px;
+    min-height: 100vh;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .gradient-bg { background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%); }
+  .card { background: #151b2e; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
+  .card-dark { background: #0f1322; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; }
+  .navbar { background: rgba(15,19,34,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); }
+  .nav-item { transition: all 0.2s; }
+  .nav-item.active svg { color: #00ff88; }
+  .nav-item.active .nav-label { color: #00ff88; }
+  .btn-primary { background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%); color: #0a0e1a; font-weight: 700; transition: all 0.15s; touch-action: manipulation; }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-ghost { background: rgba(255,255,255,0.05); color: #e8ecf5; border: 1px solid rgba(255,255,255,0.08); touch-action: manipulation; }
+  .btn-ghost:active { background: rgba(255,255,255,0.1); }
+  
+  .set-row { transition: all 0.2s; touch-action: manipulation; border: 1px solid transparent; }
+  .set-row.done { background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.25); }
+  
+  .checkbox-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0; touch-action: manipulation;
+  }
+  .set-row.done .checkbox-circle { background: linear-gradient(135deg, #00d4ff, #00ff88); border-color: transparent; }
+  
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(135deg, #00d4ff, #00ff88); border-radius: 999px; transition: width 0.3s; }
+  
+  input[type="number"] { -moz-appearance: textfield; touch-action: manipulation; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  
+  .timer-ring { transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s linear; }
+  
+  .day-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  
+  .exercise-block { border-left: 3px solid #00d4ff; padding-left: 12px; }
+  .exercise-block.push { border-color: #00ff88; }
+  .exercise-block.legs { border-color: #ff8a00; }
+  .exercise-block.core { border-color: #b478ff; }
+  .exercise-block.skill { border-color: #ff3d81; }
+  
+  .quick-rep {
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; font-weight: 600;
+    transition: all 0.15s;
+  }
+  .quick-rep:active { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+  
+  .floating-timer {
+    position: fixed; bottom: 94px; right: 16px;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #151b2e; border: 2px solid rgba(0,255,136,0.3);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    z-index: 35; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .floating-timer:active { transform: scale(0.95); }
+  .floating-timer.hidden { display: none; }
+  
+  .modal-backdrop { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); }
+  .modal-sheet { background: #0f1322; border-top: 1px solid rgba(255,255,255,0.06); border-radius: 24px 24px 0 0; }
+  
+  .emom-badge {
+    background: linear-gradient(135deg, #ff3d81, #ff8a00);
+    color: white; font-weight: 700; font-size: 10px;
+    padding: 3px 8px; border-radius: 999px; letter-spacing: 0.5px;
+  }
+  
+  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 88vw; max-width: 380px; background: #0f1322; border-left: 1px solid rgba(255,255,255,0.06); z-index: 50; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; overflow-y: auto; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  
+  .info-block { background: #151b2e; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .info-block h4 { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .info-block p, .info-block li { color: #a5adc2; font-size: 13px; line-height: 1.6; }
+  .info-block ul { padding-left: 18px; }
+  .info-block li { margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="sticky top-0 z-20 px-4 py-3 bg-gradient-to-b from-[#0a0e1a] to-transparent">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="text-xs text-gray-500" id="greeting">Воскресенье</div>
+      <div class="text-lg font-bold">Street <span class="gradient-text">Revival</span></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="day-pill" id="streakBadge" style="background:rgba(255,138,0,0.15);color:#ff8a00;">🔥 0</span>
+      <button id="menuBtn" class="w-10 h-10 rounded-full card-dark flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TODAY PAGE -->
+<div id="page-today" class="page active px-4">
+  <div class="card p-4 mb-3">
+    <div class="flex items-center justify-between mb-2">
+      <div class="text-sm font-semibold">Неделя <span id="currentWeek">1</span>/8</div>
+      <div class="text-xs text-gray-400" id="phaseLabel">Фундамент</div>
+    </div>
+    <div class="progress-bar mb-2"><div class="progress-fill" id="weekProgress" style="width: 0%"></div></div>
+    <div class="text-xs text-gray-500" id="weekProgressLabel">0 из 7 дней</div>
+  </div>
+
+  <!-- Today's card -->
+  <div id="todayCard" class="card p-4 mb-3"></div>
+
+  <button id="startBtn" class="btn-primary w-full py-4 rounded-2xl text-base mb-3 font-bold">▶ Начать тренировку</button>
+
+  <!-- Week strip -->
+  <div class="flex items-center justify-between mb-2">
+    <div class="text-sm font-bold">Неделя</div>
+    <button onclick="showPage('plan')" class="text-xs text-cyan-400 font-semibold">План →</button>
+  </div>
+  <div id="weekStrip" class="flex gap-2 mb-3 overflow-x-auto pb-1" style="scrollbar-width:none;"></div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <div class="card-dark p-2.5 text-center">
+      <div class="text-base font-bold" id="statWorkouts">0</div>
+      <div class="text-[9px] text-gray-500 uppercase">Тренировок</div>
+    </div>
+    <div class="card-dark p-2.5 text-center">
+      <div class="text-base font-bold gradient-text" id="statMaxPull">0</div>
+      <div class="text-[9px] text-gray-500 uppercase">Макс подтяг.</div>
+    </div>
+    <div class="card-dark p-2.5 text-center">
+      <div class="text-base font-bold orange-text" id="statTotalReps">0</div>
+      <div class="text-[9px] text-gray-500 uppercase">Всего повт.</div>
+    </div>
+  </div>
+
+  <div class="text-sm font-bold mb-2">Последние</div>
+  <div id="historyList" class="space-y-2 mb-4"></div>
+</div>
+
+<!-- PLAN PAGE -->
+<div id="page-plan" class="page px-4">
+  <div class="text-lg font-bold mb-1">План недели</div>
+  <div class="text-xs text-gray-400 mb-3" id="planPhaseLabel"></div>
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-3" id="weekTabs" style="scrollbar-width:none;"></div>
+  <div id="planContent" class="space-y-2"></div>
+</div>
+
+<!-- WORKOUT PAGE -->
+<div id="page-workout" class="page px-4">
+  <div class="flex items-center justify-between mb-3">
+    <button onclick="exitWorkout()" class="w-10 h-10 rounded-full card-dark flex items-center justify-center">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="text-center">
+      <div class="text-xs text-gray-400">Время</div>
+      <div class="text-base font-bold" id="workoutTimer">00:00</div>
+    </div>
+    <button onclick="finishWorkout()" class="px-4 py-2 rounded-full btn-primary text-sm font-bold">Готово</button>
+  </div>
+
+  <div id="workoutHeader" class="card p-3 mb-3"></div>
+
+  <!-- EMOM card (shown when applicable) -->
+  <div id="emomCard" class="card p-4 mb-3 hidden" style="border:1px solid rgba(255,61,129,0.3); background:linear-gradient(135deg, rgba(255,61,129,0.08), rgba(255,138,0,0.08));">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <span class="emom-badge">EMOM</span>
+        <div class="text-sm font-bold" id="emomTitle">Каждую минуту</div>
+      </div>
+      <div class="text-2xl font-bold" id="emomTime">01:00</div>
+    </div>
+    <div class="text-xs text-gray-400 mb-2" id="emomDesc"></div>
+    <button id="emomBtn" class="btn-primary w-full py-2.5 rounded-xl text-sm font-bold">▶ Запустить EMOM</button>
+  </div>
+
+  <div id="exerciseList" class="space-y-3 mb-4"></div>
+</div>
+
+<!-- PROGRESS PAGE -->
+<div id="page-progress" class="page px-4">
+  <div class="text-lg font-bold mb-3">Прогресс</div>
+  <div class="card p-4 mb-3">
+    <div class="text-xs text-gray-400 mb-1">Макс подтягиваний в подходе</div>
+    <div class="text-3xl font-bold gradient-text" id="progressMaxPull">0</div>
+    <div id="chartPullWrap" class="mt-3" style="height:140px;position:relative;">
+      <canvas id="chartPull"></canvas>
+    </div>
+    <div id="emptyPull" class="text-center text-xs text-gray-500 py-8 hidden">Нет данных. Завершите первую тренировку</div>
+  </div>
+  <div class="card p-4 mb-3">
+    <div class="text-xs text-gray-400 mb-1">Объём по неделям</div>
+    <div class="text-3xl font-bold" id="progressVolume">0</div>
+    <div class="mt-3" style="height:140px;position:relative;">
+      <canvas id="chartVolume"></canvas>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-3">
+    <div class="card p-3">
+      <div class="text-xs text-gray-500">Тренировок</div>
+      <div class="text-xl font-bold mt-1" id="progWorkouts">0</div>
+    </div>
+    <div class="card p-3">
+      <div class="text-xs text-gray-500">Всего повт.</div>
+      <div class="text-xl font-bold mt-1 orange-text" id="progTotalReps">0</div>
+    </div>
+  </div>
+  <div class="card p-4">
+    <div class="text-sm font-bold mb-3">🎯 Цели программы</div>
+    <div class="space-y-3" id="goalsList"></div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page px-4">
+  <div class="text-lg font-bold mb-3">Профиль</div>
+  <div class="card p-4 mb-3">
+    <div class="text-sm font-bold mb-3">Замеры</div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs text-gray-500">Рост (см)</label>
+        <input id="inputHeight" type="number" class="w-full bg-white/5 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-cyan-400" value="182">
+      </div>
+      <div>
+        <label class="text-xs text-gray-500">Вес (кг)</label>
+        <input id="inputWeight" type="number" step="0.1" class="w-full bg-white/5 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-cyan-400" value="73.5">
+      </div>
+      <div>
+        <label class="text-xs text-gray-500">Макс подтяг.</label>
+        <input id="inputMaxPull" type="number" class="w-full bg-white/5 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-cyan-400" value="10">
+      </div>
+      <div>
+        <label class="text-xs text-gray-500">Макс брусья</label>
+        <input id="inputMaxDip" type="number" class="w-full bg-white/5 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-cyan-400" value="5">
+      </div>
+    </div>
+    <button onclick="saveProfile()" class="btn-primary w-full py-3 rounded-xl text-sm mt-3 font-bold">Сохранить</button>
+  </div>
+  <div class="card p-4 mb-3">
+    <div class="text-sm font-bold mb-3">Дневник веса</div>
+    <div id="chartWeightWrap" style="height:130px;position:relative;">
+      <canvas id="chartWeight"></canvas>
+    </div>
+    <div id="emptyWeight" class="text-center text-xs text-gray-500 py-6 hidden">Нет записей</div>
+    <button onclick="logWeightToday()" class="btn-ghost w-full py-2 rounded-xl text-sm mt-2">+ Записать вес</button>
+  </div>
+  <div class="card p-4 mb-3">
+    <div class="space-y-1">
+      <button onclick="exportData()" class="w-full text-left py-2.5 text-sm">📤 Экспорт данных</button>
+      <button onclick="resetProgress()" class="w-full text-left py-2.5 text-sm text-red-400">🗑 Сбросить прогресс</button>
+    </div>
+  </div>
+  <div class="text-xs text-gray-600 text-center">Street Revival · v3.0</div>
+</div>
+
+<!-- FLOATING TIMER -->
+<div id="floatingTimer" class="floating-timer hidden" onclick="openTimerModal()">
+  <svg width="64" height="64" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+    <circle id="ringMini" class="timer-ring" cx="12" cy="12" r="10" fill="none" stroke="url(#gMini)" stroke-width="2" stroke-linecap="round" stroke-dasharray="62.83" stroke-dashoffset="0"/>
+    <defs>
+      <linearGradient id="gMini" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#00ff88"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <div class="absolute text-xs font-bold" id="timerMini">1:30</div>
+</div>
+
+<!-- TIMER MODAL -->
+<div id="timerModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-end justify-center">
+  <div class="modal-sheet w-full max-w-md p-6 pb-8">
+    <div class="flex items-center justify-between mb-5">
+      <div class="text-lg font-bold">Таймер отдыха</div>
+      <button onclick="closeTimerModal()" class="w-8 h-8 rounded-full card-dark flex items-center justify-center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="flex justify-center mb-5">
+      <div class="relative" style="width:200px;height:200px;">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+          <circle id="ringModal" class="timer-ring" cx="100" cy="100" r="88" fill="none" stroke="url(#gModal)" stroke-width="10" stroke-linecap="round" stroke-dasharray="552.92" stroke-dashoffset="0"/>
+          <defs>
+            <linearGradient id="gModal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#00ff88"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <div class="text-4xl font-bold" id="timerModal">01:30</div>
+          <div class="text-xs text-gray-500 mt-1" id="timerStatus">Готов</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <button id="timerMainBtn" class="btn-primary py-3 rounded-xl text-sm font-bold">Старт</button>
+      <button id="timerResetBtn" class="btn-ghost py-3 rounded-xl text-sm">Сбросить</button>
+    </div>
+    <div class="text-xs text-gray-500 mb-2">Пресеты</div>
+    <div class="grid grid-cols-5 gap-2">
+      <button class="timer-preset quick-rep" data-sec="30">30с</button>
+      <button class="timer-preset quick-rep" data-sec="60">1:00</button>
+      <button class="timer-preset quick-rep" data-sec="90">1:30</button>
+      <button class="timer-preset quick-rep" data-sec="120">2:00</button>
+      <button class="timer-preset quick-rep" data-sec="180">3:00</button>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div id="drawerBackdrop" class="drawer-backdrop"></div>
+<aside id="drawer" class="drawer">
+  <div id="drawerMain">
+    <div class="p-4 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#0f1322] z-10">
+      <div class="text-base font-bold">Меню</div>
+      <button id="drawerClose" class="w-9 h-9 rounded-full card-dark flex items-center justify-center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="p-3 space-y-1">
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="method">
+        <span class="text-xl">🧬</span><div class="flex-1"><div class="font-semibold text-sm">Методика</div><div class="text-[11px] text-gray-500">Почему именно такой план</div></div>
+      </button>
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="guide">
+        <span class="text-xl">📖</span><div class="flex-1"><div class="font-semibold text-sm">Как пользоваться</div><div class="text-[11px] text-gray-500">Инструкция по приложению</div></div>
+      </button>
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="technique">
+        <span class="text-xl">💪</span><div class="flex-1"><div class="font-semibold text-sm">Техника упражнений</div><div class="text-[11px] text-gray-500">Описание и хваты</div></div>
+      </button>
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="tips">
+        <span class="text-xl">💡</span><div class="flex-1"><div class="font-semibold text-sm">Советы</div><div class="text-[11px] text-gray-500">Тренировки и восстановление</div></div>
+      </button>
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="lifestyle">
+        <span class="text-xl">🍎</span><div class="flex-1"><div class="font-semibold text-sm">Образ жизни</div><div class="text-[11px] text-gray-500">Питание, сон, добавки</div></div>
+      </button>
+    </div>
+  </div>
+
+  <div id="section-method" class="p-4 hidden">
+    <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
+    <div class="text-base font-bold mb-3">Методика программы</div>
+    <div class="space-y-2">
+      <div class="info-block"><h4>Для кого</h4><p>Для атлетов с опытом (3-4 года, КМС стритлифтинг, 28 подтягиваний), которые сделали перерыв и потеряли форму. Мышечная память позволит вернуться быстро, но нагрузка должна быть адекватной.</p></div>
+      <div class="info-block"><h4>Структура: 4 фазы по 2 недели</h4>
+        <ul>
+          <li><b>Недели 1-2 · Фундамен
