@@ -11,17 +11,11 @@
 <style>
   * { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
   html, body { overscroll-behavior: none; }
-  body {
-    background: #0a0e1a;
-    color: #e8ecf5;
-    padding-bottom: 86px;
-    min-height: 100vh;
-  }
-  .gradient-text {
-    background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
+  body { background: #0a0e1a; color: #e8ecf5; padding-bottom: 86px; min-height: 100vh; }
+  .gradient-text { background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .gradient-bg { background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%); }
+  .orange-bg { background: linear-gradient(135deg, #ff8a00 0%, #ff3d81 100%); }
+  .orange-text { background: linear-gradient(135deg, #ff8a00 0%, #ff3d81 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .card { background: #151b2e; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; }
   .card-dark { background: #0f1322; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; }
   .navbar { background: rgba(15,19,34,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); }
@@ -30,19 +24,17 @@
   .nav-item.active .nav-label { color: #00ff88; }
   .btn-primary { background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%); color: #0a0e1a; font-weight: 700; transition: all 0.15s; touch-action: manipulation; }
   .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.5; }
   .btn-ghost { background: rgba(255,255,255,0.05); color: #e8ecf5; border: 1px solid rgba(255,255,255,0.08); touch-action: manipulation; }
   .btn-ghost:active { background: rgba(255,255,255,0.1); }
+  .btn-danger { background: rgba(255,61,92,0.1); color: #ff6b6b; border: 1px solid rgba(255,61,92,0.2); touch-action: manipulation; }
+  .btn-danger:active { background: rgba(255,61,92,0.2); }
   
   .set-row { transition: all 0.2s; touch-action: manipulation; border: 1px solid transparent; }
   .set-row.done { background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.25); }
   
-  .checkbox-circle {
-    width: 42px; height: 42px; border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.15);
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; flex-shrink: 0; touch-action: manipulation;
-  }
-  .set-row.done .checkbox-circle { background: linear-gradient(135deg, #00d4ff, #00ff88); border-color: transparent; }
+  .check-indicator { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; transition: all 0.25s; flex-shrink: 0; }
+  .check-indicator.active { background: linear-gradient(135deg, #00d4ff, #00ff88); border-color: transparent; box-shadow: 0 0 16px rgba(0,255,136,0.4); }
   
   .page { display: none; }
   .page.active { display: block; animation: fadeIn 0.2s; }
@@ -51,52 +43,29 @@
   .progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
   .progress-fill { height: 100%; background: linear-gradient(135deg, #00d4ff, #00ff88); border-radius: 999px; transition: width 0.3s; }
   
-  input[type="number"] { -moz-appearance: textfield; touch-action: manipulation; }
+  input[type="number"], input[type="date"] { -moz-appearance: textfield; touch-action: manipulation; }
   input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
   ::-webkit-scrollbar { width: 0; height: 0; }
   
   .timer-ring { transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s linear; }
   
-  .day-pill {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 8px; border-radius: 999px;
-    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
-  }
+  .day-pill { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
   
   .exercise-block { border-left: 3px solid #00d4ff; padding-left: 12px; }
-  .exercise-block.push { border-color: #00ff88; }
-  .exercise-block.legs { border-color: #ff8a00; }
-  .exercise-block.core { border-color: #b478ff; }
-  .exercise-block.skill { border-color: #ff3d81; }
   
-  .quick-rep {
-    padding: 6px 10px; border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    font-size: 12px; font-weight: 600;
-    transition: all 0.15s;
-  }
-  .quick-rep:active { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+  .quick-rep { padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 12px; font-weight: 700; transition: all 0.15s; touch-action: manipulation; flex-shrink: 0; }
+  .quick-rep:active { background: rgba(0,212,255,0.2); border-color: #00d4ff; transform: scale(0.95); }
+  .quick-rep.primary { background: rgba(0,212,255,0.15); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
   
-  .floating-timer {
-    position: fixed; bottom: 94px; right: 16px;
-    width: 72px; height: 72px; border-radius: 50%;
-    background: #151b2e; border: 2px solid rgba(0,255,136,0.3);
-    display: flex; align-items: center; justify-content: center; flex-direction: column;
-    z-index: 35; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    cursor: pointer; transition: all 0.2s;
-  }
+  .floating-timer { position: fixed; bottom: 94px; right: 16px; width: 72px; height: 72px; border-radius: 50%; background: #151b2e; border: 2px solid rgba(0,255,136,0.3); display: flex; align-items: center; justify-content: center; flex-direction: column; z-index: 35; box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s; }
   .floating-timer:active { transform: scale(0.95); }
   .floating-timer.hidden { display: none; }
   
   .modal-backdrop { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); }
   .modal-sheet { background: #0f1322; border-top: 1px solid rgba(255,255,255,0.06); border-radius: 24px 24px 0 0; }
   
-  .emom-badge {
-    background: linear-gradient(135deg, #ff3d81, #ff8a00);
-    color: white; font-weight: 700; font-size: 10px;
-    padding: 3px 8px; border-radius: 999px; letter-spacing: 0.5px;
-  }
+  .emom-badge { background: linear-gradient(135deg, #ff3d81, #ff8a00); color: white; font-weight: 700; font-size: 10px; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.5px; }
   
   .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 88vw; max-width: 380px; background: #0f1322; border-left: 1px solid rgba(255,255,255,0.06); z-index: 50; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; overflow-y: auto; }
   .drawer.open { transform: translateX(0); }
@@ -108,6 +77,14 @@
   .info-block p, .info-block li { color: #a5adc2; font-size: 13px; line-height: 1.6; }
   .info-block ul { padding-left: 18px; }
   .info-block li { margin-bottom: 3px; }
+  
+  .day-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .day-dot.done { background: linear-gradient(135deg, #00d4ff, #00ff88); color: #0a0e1a; }
+  .day-dot.next { background: linear-gradient(135deg, #ff8a00, #ff3d81); color: #0a0e1a; box-shadow: 0 0 0 3px rgba(255,138,0,0.2); }
+  .day-dot.missed { background: rgba(255,61,92,0.15); color: #ff6b6b; border: 1px dashed rgba(255,61,92,0.4); }
+  .day-dot.future { background: rgba(255,255,255,0.05); color: #5a6378; }
+  
+  .range-hint { display: inline-block; padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 600; background: rgba(0,212,255,0.1); color: #00d4ff; }
 </style>
 </head>
 <body>
@@ -120,6 +97,7 @@
       <div class="text-lg font-bold">Street <span class="gradient-text">Revival</span></div>
     </div>
     <div class="flex items-center gap-2">
+      <span class="day-pill" id="programDayBadge" style="background:rgba(0,212,255,0.15);color:#00d4ff;">День 1</span>
       <span class="day-pill" id="streakBadge" style="background:rgba(255,138,0,0.15);color:#ff8a00;">🔥 0</span>
       <button id="menuBtn" class="w-10 h-10 rounded-full card-dark flex items-center justify-center">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -137,21 +115,19 @@
     </div>
     <div class="progress-bar mb-2"><div class="progress-fill" id="weekProgress" style="width: 0%"></div></div>
     <div class="text-xs text-gray-500" id="weekProgressLabel">0 из 7 дней</div>
+    <div class="text-[10px] text-gray-600 mt-1" id="weekDates"></div>
   </div>
 
-  <!-- Today's card -->
   <div id="todayCard" class="card p-4 mb-3"></div>
 
   <button id="startBtn" class="btn-primary w-full py-4 rounded-2xl text-base mb-3 font-bold">▶ Начать тренировку</button>
 
-  <!-- Week strip -->
   <div class="flex items-center justify-between mb-2">
     <div class="text-sm font-bold">Неделя</div>
     <button onclick="showPage('plan')" class="text-xs text-cyan-400 font-semibold">План →</button>
   </div>
   <div id="weekStrip" class="flex gap-2 mb-3 overflow-x-auto pb-1" style="scrollbar-width:none;"></div>
 
-  <!-- Stats -->
   <div class="grid grid-cols-3 gap-2 mb-3">
     <div class="card-dark p-2.5 text-center">
       <div class="text-base font-bold" id="statWorkouts">0</div>
@@ -173,7 +149,7 @@
 
 <!-- PLAN PAGE -->
 <div id="page-plan" class="page px-4">
-  <div class="text-lg font-bold mb-1">План недели</div>
+  <div class="text-lg font-bold mb-1">План программы</div>
   <div class="text-xs text-gray-400 mb-3" id="planPhaseLabel"></div>
   <div class="flex gap-2 overflow-x-auto pb-2 mb-3" id="weekTabs" style="scrollbar-width:none;"></div>
   <div id="planContent" class="space-y-2"></div>
@@ -194,14 +170,13 @@
 
   <div id="workoutHeader" class="card p-3 mb-3"></div>
 
-  <!-- EMOM card (shown when applicable) -->
   <div id="emomCard" class="card p-4 mb-3 hidden" style="border:1px solid rgba(255,61,129,0.3); background:linear-gradient(135deg, rgba(255,61,129,0.08), rgba(255,138,0,0.08));">
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center gap-2">
         <span class="emom-badge">EMOM</span>
         <div class="text-sm font-bold" id="emomTitle">Каждую минуту</div>
       </div>
-      <div class="text-2xl font-bold" id="emomTime">01:00</div>
+      <div class="text-2xl font-bold" id="emomTime">00:00</div>
     </div>
     <div class="text-xs text-gray-400 mb-2" id="emomDesc"></div>
     <button id="emomBtn" class="btn-primary w-full py-2.5 rounded-xl text-sm font-bold">▶ Запустить EMOM</button>
@@ -216,17 +191,13 @@
   <div class="card p-4 mb-3">
     <div class="text-xs text-gray-400 mb-1">Макс подтягиваний в подходе</div>
     <div class="text-3xl font-bold gradient-text" id="progressMaxPull">0</div>
-    <div id="chartPullWrap" class="mt-3" style="height:140px;position:relative;">
-      <canvas id="chartPull"></canvas>
-    </div>
-    <div id="emptyPull" class="text-center text-xs text-gray-500 py-8 hidden">Нет данных. Завершите первую тренировку</div>
+    <div id="chartPullWrap" class="mt-3" style="height:140px;position:relative;"><canvas id="chartPull"></canvas></div>
+    <div id="emptyPull" class="text-center text-xs text-gray-500 py-8 hidden">Нет данных</div>
   </div>
   <div class="card p-4 mb-3">
     <div class="text-xs text-gray-400 mb-1">Объём по неделям</div>
     <div class="text-3xl font-bold" id="progressVolume">0</div>
-    <div class="mt-3" style="height:140px;position:relative;">
-      <canvas id="chartVolume"></canvas>
-    </div>
+    <div class="mt-3" style="height:140px;position:relative;"><canvas id="chartVolume"></canvas></div>
   </div>
   <div class="grid grid-cols-2 gap-2 mb-3">
     <div class="card p-3">
@@ -246,7 +217,44 @@
 
 <!-- PROFILE PAGE -->
 <div id="page-profile" class="page px-4">
-  <div class="text-lg font-bold mb-3">Профиль</div>
+  <div class="text-lg font-bold mb-3">Профиль и настройки</div>
+  
+  <!-- CYCLE CONTROL -->
+  <div class="card p-4 mb-3" style="border:1px solid rgba(0,212,255,0.2);">
+    <div class="flex items-center gap-2 mb-2">
+      <span style="font-size:18px;">🗓</span>
+      <div class="text-sm font-bold">Тренировочный цикл</div>
+    </div>
+    <div class="text-xs text-gray-400 mb-3">
+      Цикл начинается с выбранной даты. «День 1» программы = дата старта, «День 2» = следующий день и т.д. Дни недели в программе (ПН, ВТ...) — это условные названия тренировок, они НЕ привязаны к реальному календарю.
+    </div>
+    
+    <div class="card-dark p-3 mb-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs text-gray-500">Старт цикла</div>
+          <div class="text-base font-bold" id="profileStartDate">—</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-gray-500">Сегодня</div>
+          <div class="text-base font-bold gradient-text" id="profileProgramDay">День 1</div>
+        </div>
+      </div>
+      <div class="text-xs text-gray-500 mt-2" id="profileWeekInfo">Неделя 1 из 8</div>
+    </div>
+    
+    <button id="startCycleBtn" class="btn-primary w-full py-3 rounded-xl text-sm mb-2 font-bold">
+      🚀 Начать цикл сегодня
+    </button>
+    
+    <div class="flex items-center gap-2 mb-2">
+      <label class="text-xs text-gray-400 whitespace-nowrap">Или выбрать дату:</label>
+      <input id="startDateInput" type="date" class="flex-1 bg-white/5 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400">
+    </div>
+    <button onclick="applyCustomStartDate()" class="btn-ghost w-full py-2.5 rounded-xl text-sm font-semibold">Применить дату</button>
+  </div>
+  
+  <!-- MEASUREMENTS -->
   <div class="card p-4 mb-3">
     <div class="text-sm font-bold mb-3">Замеры</div>
     <div class="grid grid-cols-2 gap-3">
@@ -267,28 +275,29 @@
         <input id="inputMaxDip" type="number" class="w-full bg-white/5 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-1 focus:ring-cyan-400" value="5">
       </div>
     </div>
-    <button onclick="saveProfile()" class="btn-primary w-full py-3 rounded-xl text-sm mt-3 font-bold">Сохранить</button>
+    <button onclick="saveProfile()" class="btn-primary w-full py-3 rounded-xl text-sm mt-3 font-bold">Сохранить замеры</button>
   </div>
+  
+  <!-- WEIGHT LOG -->
   <div class="card p-4 mb-3">
     <div class="text-sm font-bold mb-3">Дневник веса</div>
-    <div id="chartWeightWrap" style="height:130px;position:relative;">
-      <canvas id="chartWeight"></canvas>
-    </div>
+    <div id="chartWeightWrap" style="height:130px;position:relative;"><canvas id="chartWeight"></canvas></div>
     <div id="emptyWeight" class="text-center text-xs text-gray-500 py-6 hidden">Нет записей</div>
     <button onclick="logWeightToday()" class="btn-ghost w-full py-2 rounded-xl text-sm mt-2">+ Записать вес</button>
   </div>
+  
   <div class="card p-4 mb-3">
     <div class="space-y-1">
       <button onclick="exportData()" class="w-full text-left py-2.5 text-sm">📤 Экспорт данных</button>
-      <button onclick="resetProgress()" class="w-full text-left py-2.5 text-sm text-red-400">🗑 Сбросить прогресс</button>
+      <button onclick="resetProgress()" class="w-full text-left py-2.5 text-sm text-red-400">🗑 Сбросить весь прогресс</button>
     </div>
   </div>
-  <div class="text-xs text-gray-600 text-center">Street Revival · v3.0</div>
+  <div class="text-xs text-gray-600 text-center">Street Revival · v4.0</div>
 </div>
 
 <!-- FLOATING TIMER -->
 <div id="floatingTimer" class="floating-timer hidden" onclick="openTimerModal()">
-  <svg width="64" height="64" viewBox="0 0 24 24">
+  <svg width="64" height="64" viewBox="0 0 24 24" style="position:absolute;">
     <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
     <circle id="ringMini" class="timer-ring" cx="12" cy="12" r="10" fill="none" stroke="url(#gMini)" stroke-width="2" stroke-linecap="round" stroke-dasharray="62.83" stroke-dashoffset="0"/>
     <defs>
@@ -297,11 +306,11 @@
       </linearGradient>
     </defs>
   </svg>
-  <div class="absolute text-xs font-bold" id="timerMini">1:30</div>
+  <div class="text-xs font-bold z-10" id="timerMini">1:30</div>
 </div>
 
 <!-- TIMER MODAL -->
-<div id="timerModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-end justify-center">
+<div id="timerModal" class="fixed inset-0 z-50 modal-backdrop hidden items-end justify-center">
   <div class="modal-sheet w-full max-w-md p-6 pb-8">
     <div class="flex items-center justify-between mb-5">
       <div class="text-lg font-bold">Таймер отдыха</div>
@@ -321,7 +330,7 @@
           </defs>
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <div class="text-4xl font-bold" id="timerModal">01:30</div>
+          <div class="text-4xl font-bold" id="timerModalDisp">01:30</div>
           <div class="text-xs text-gray-500 mt-1" id="timerStatus">Готов</div>
         </div>
       </div>
@@ -352,14 +361,14 @@
       </button>
     </div>
     <div class="p-3 space-y-1">
-      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="method">
-        <span class="text-xl">🧬</span><div class="flex-1"><div class="font-semibold text-sm">Методика</div><div class="text-[11px] text-gray-500">Почему именно такой план</div></div>
-      </button>
       <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="guide">
-        <span class="text-xl">📖</span><div class="flex-1"><div class="font-semibold text-sm">Как пользоваться</div><div class="text-[11px] text-gray-500">Инструкция по приложению</div></div>
+        <span class="text-xl">📖</span><div class="flex-1"><div class="font-semibold text-sm">Как пользоваться</div><div class="text-[11px] text-gray-500">Инструкция</div></div>
+      </button>
+      <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="method">
+        <span class="text-xl">🧬</span><div class="flex-1"><div class="font-semibold text-sm">Методика</div><div class="text-[11px] text-gray-500">Почему такой план</div></div>
       </button>
       <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="technique">
-        <span class="text-xl">💪</span><div class="flex-1"><div class="font-semibold text-sm">Техника упражнений</div><div class="text-[11px] text-gray-500">Описание и хваты</div></div>
+        <span class="text-xl">💪</span><div class="flex-1"><div class="font-semibold text-sm">Техника</div><div class="text-[11px] text-gray-500">Описание упражнений</div></div>
       </button>
       <button class="menu-item w-full text-left p-3 rounded-xl flex items-center gap-3" data-section="tips">
         <span class="text-xl">💡</span><div class="flex-1"><div class="font-semibold text-sm">Советы</div><div class="text-[11px] text-gray-500">Тренировки и восстановление</div></div>
@@ -370,40 +379,44 @@
     </div>
   </div>
 
-  <div id="section-method" class="p-4 hidden">
-    <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
-    <div class="text-base font-bold mb-3">Методика программы</div>
-    <div class="space-y-2">
-      <div class="info-block"><h4>Для кого</h4><p>Для атлетов с опытом (3-4 года, КМС стритлифтинг, 28 подтягиваний), которые сделали перерыв и потеряли форму. Мышечная память позволит вернуться быстро, но нагрузка должна быть адекватной.</p></div>
-      <div class="info-block"><h4>Структура: 4 фазы по 2 недели</h4>
-        <ul>
-          <li><b>Недели 1-2 · Фундамент.</b> Большой объём базовых движений, восстановление техники, разные хваты. 6 рабочих дней.</li>
-          <li><b>Недели 3-4 · Взрыв.</b> Вводим высокие подтягивания, взрывные отжимания, негативные выходы на две.</li>
-          <li><b>Недели 5-6 · Выходы.</b> Полные попытки выхода на две, работа с доп. весом, EMOM высокой плотности.</li>
-          <li><b>Недели 7-8 · Пик.</b> Максимумы, серии выходов, итоговые тесты.</li>
-        </ul>
-      </div>
-      <div class="info-block"><h4>Принцип волн</h4><p>Внутри недели: ПН/ПТ — тяни, ВТ/СБ — толкай, СР/ВС — ноги+кардио, ЧТ — техника выходов и активное восстановление. Это даёт мышцам 48-72ч на восстановление.</p></div>
-      <div class="info-block"><h4>Разнообразие хватов</h4><p>В одной тренировке 3-4 разных хвата (обычный, широкий, обратный, узкий, командо). Это задействует мышцы под разными углами и предотвращает плато.</p></div>
-      <div class="info-block"><h4>EMOM и лесенки</h4><p>Развивают <b>мышечную выносливость</b> и <b>плотность тренировки</b>. EMOM 20 мин × 6 повт = 120 подтягиваний за 20 минут — это серьёзная нагрузка.</p></div>
-    </div>
-  </div>
-
   <div id="section-guide" class="p-4 hidden">
     <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
     <div class="text-base font-bold mb-3">Как пользоваться</div>
     <div class="space-y-2">
-      <div class="info-block"><h4>1. Перед тренировкой</h4><p>На главной видно <b>текущую тренировку дня</b> со списком упражнений и схемой подходов (напр. 5×6-8 — 5 подходов по 6-8 повторов).</p></div>
-      <div class="info-block"><h4>2. Во время тренировки</h4>
+      <div class="info-block"><h4>🗓 Старт цикла</h4><p>В <b>«Профиль»</b> нажми <b>«Начать цикл сегодня»</b> — это задаст стартовую дату. С неё начинается День 1 программы. Можешь выбрать любую другую дату через календарь. Дни недели (ПН, ВТ...) — это просто названия тренировок, они идут подряд от старта.</p></div>
+      <div class="info-block"><h4>Пропущенные тренировки</h4><p>Если день прошёл, а тренировка не сделана — она становится <b>«долгом»</b> (красный кружок). Сначала закрываешь долги, потом идёшь дальше по программе.</p></div>
+      <div class="info-block"><h4>Во время тренировки</h4>
         <ul>
-          <li>Нажми <b>«Начать тренировку»</b></li>
-          <li>В каждом подходе вписывай реальные повторы (или жми быстрые кнопки +5/+8/+10)</li>
-          <li>Жми кружок справа — подход отметится, таймер запустится автоматически</li>
-          <li>Плавающий таймер в углу — тапни, чтобы открыть полное окно</li>
+          <li>В каждом подходе вводи число повторов или жми быстрые кнопки</li>
+          <li>Галочка загорается <b>автоматически</b>, когда значение попадает в диапазон</li>
+          <li>Таймер отдыха тоже запускается сам</li>
         </ul>
       </div>
-      <div class="info-block"><h4>3. EMOM дни</h4><p>Сверху будет карточка <b>EMOM</b>. Жми «Запустить EMOM» — каждую минуту будет сигнал, делай заданное число повторов, остаток минуты — отдых. Внизу отмечай выполненные минуты.</p></div>
-      <div class="info-block"><h4>4. Завершение</h4><p>Кнопка <b>«Готово»</b> вверху справа. Тренировка сохранится, неделя продвинется автоматически после 7 дней.</p></div>
+      <div class="info-block"><h4>Кнопки быстрого добавления</h4>
+        <ul>
+          <li><b>+1</b> — одно повторение</li>
+          <li><b>+min</b> — сразу минимум из диапазона</li>
+          <li><b>+max</b> — сразу максимум</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="section-method" class="p-4 hidden">
+    <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
+    <div class="text-base font-bold mb-3">Методика программы</div>
+    <div class="space-y-2">
+      <div class="info-block"><h4>Для кого</h4><p>Для атлетов с опытом (3-4 года, КМС стритлифтинг, 28 подтягиваний), которые сделали перерыв и потеряли форму.</p></div>
+      <div class="info-block"><h4>Структура: 4 фазы по 2 недели</h4>
+        <ul>
+          <li><b>Недели 1-2 · Фундамент.</b> Большой объём базы, техника, разные хваты.</li>
+          <li><b>Недели 3-4 · Взрыв.</b> Высокие подтягивания, взрывные отжимания, негативы выходов.</li>
+          <li><b>Недели 5-6 · Выходы.</b> Полные попытки выхода на две, доп. вес, EMOM.</li>
+          <li><b>Недели 7-8 · Пик.</b> Максимумы, серии выходов, тесты.</li>
+        </ul>
+      </div>
+      <div class="info-block"><h4>Принцип волн</h4><p>Тяни / Толкай / Ноги+кор / Техника / Тяни выносл. / Толкай выносл. / Кондиционка. Мышцы получают 48-72ч восстановления.</p></div>
+      <div class="info-block"><h4>Разнообразие хватов</h4><p>В одной тренировке 3-4 разных хвата. Это предотвращает плато и прорабатывает мышцы под разными углами.</p></div>
     </div>
   </div>
 
@@ -411,25 +424,20 @@
     <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
     <div class="text-base font-bold mb-3">Техника упражнений</div>
     <div class="space-y-2">
-      <div class="info-block"><h4>Подтягивания — хваты</h4>
+      <div class="info-block"><h4>Хваты подтягиваний</h4>
         <ul>
-          <li><b>Обычный</b> (пронация, шир. плеч) — база, широчайшие</li>
-          <li><b>Широкий</b> (пронация, шире плеч) — верх спины, "крылья"</li>
-          <li><b>Обратный</b> (супинация) — бицепс + низ широчайших</li>
-          <li><b>Узкий</b> (руки вместе) — брахиалис, предплечья</li>
-          <li><b>Коммандо</b> (разноимённый, боком) — косые, корпус</li>
-          <li><b>За голову</b> — верх спины (осторожно с плечами)</li>
+          <li><b>Обычный</b> — база, широчайшие</li>
+          <li><b>Широкий</b> — верх спины</li>
+          <li><b>Обратный</b> — бицепс + низ широчайших</li>
+          <li><b>Узкий</b> — брахиалис, предплечья</li>
+          <li><b>Коммандо</b> — разноимённый, косые</li>
         </ul>
       </div>
-      <div class="info-block"><h4>Высокие подтягивания</h4><p>Взрывное движение, цель — дотянуть перекладину <b>к груди или животу</b>, а не подбородку. Развивает стартовую силу для выходов. Делай мало повторов (3-5), но <b>максимально резко</b>.</p></div>
-      <div class="info-block"><h4>Негативные выходы на две</h4><p>Запрыгни в упор над перекладиной → медленно (5-7 сек) опустись в вис через переход. Учит тело траектории перехода. Обязательное подводящее!</p></div>
-      <div class="info-block"><h4>Выход на две (muscle-up)</h4><p>Взрывное подтягивание до пояса → проворот кистей → выход в упор. <b>Требует базы: 15+ подтягиваний</b>, уверенные высокие к груди. Не торопись, техника важнее силы.</p></div>
-      <div class="info-block"><h4>Взрывные отжимания</h4><p>Мощный толчок, руки отрываются от пола. Варианты: хлопок, смена ширины, супермен. Развивают <b>быстрые мышечные волокна</b>.</p></div>
-      <div class="info-block"><h4>L-sit</h4><p>Упор на брусьях/полу, ноги подняты параллельно земле. Статика на пресс, подвздошные, трицепс. Начинай с 10-15 сек, постепенно доводи до 30-60 сек.</p></div>
-      <div class="info-block"><h4>Пистолетик</h4><p>Приседание на одной ноге, вторая вперёд. Сложнейшее движение для ног. Начинай с негативов и с опорой.</p></div>
-      <div class="info-block"><h4>EMOM (Every Minute On the Minute)</h4><p>В начале каждой минуты делаешь заданное число повторов, остаток минуты — отдых. Если не уложился — отдых сокращается. Развивает выносливость и плотность.</p></div>
-      <div class="info-block"><h4>Лесенка 1-N-1</h4><p>1 повт, отдых, 2 повт, отдых... до N и обратно. Сумма = N². Напр. 1-10-1 = 100 повт. Очень развивает выносливость.</p></div>
-      <div class="info-block"><h4>AMRAP</h4><p>As Many Reps As Possible — максимум повторов за заданное время. Используй в тестах.</p></div>
+      <div class="info-block"><h4>Высокие подтягивания</h4><p>Взрывное движение, цель — дотянуть перекладину <b>к груди или животу</b>. Развивает стартовую силу для выходов. Мало повторов, но максимально резко.</p></div>
+      <div class="info-block"><h4>Негативные выходы</h4><p>Запрыгни в упор → медленно (5-7 сек) опустись. Учит тело траектории. Обязательное подводящее!</p></div>
+      <div class="info-block"><h4>Выход на две</h4><p>Взрывное подтягивание до пояса → проворот кистей → выход в упор. База: 15+ подтягиваний.</p></div>
+      <div class="info-block"><h4>EMOM</h4><p>В начале каждой минуты делаешь повторы, остаток — отдых. Развивает выносливость.</p></div>
+      <div class="info-block"><h4>Лесенка 1-N-1</h4><p>1 повт → 2 → ... → N → ... → 1. Сумма = N². Очень развивает выносливость.</p></div>
     </div>
   </div>
 
@@ -437,14 +445,12 @@
     <button class="back-btn text-sm text-cyan-400 mb-3">← Назад</button>
     <div class="text-base font-bold mb-3">Советы</div>
     <div class="space-y-2">
-      <div class="info-block"><h4>🔥 Разминка обязательна</h4><p>5-10 мин: суставная гимнастика, махи руками, 2 подхода × 3-5 лёгких подтягиваний. Без разминки локти и плечи откажут к 3 неделе.</p></div>
-      <div class="info-block"><h4>🎯 Техника важнее цифр</h4><p>Полная амплитуда, без рывков, лопатки вниз и вместе в начале движения. Чистые 8 повторов > 12 грязных.</p></div>
-      <div class="info-block"><h4>⚡ Взрывные — свежим</h4><p>Высокие подтягивания, выходы, взрывные отжимания — <b>в начале тренировки</b>, пока ЦНС свежая. Усталость = плохая техника = травма.</p></div>
-      <div class="info-block"><h4>🧘 Слушай локти</h4><p>Если ноют локти/плечи — 1-2 дня отдыха, снижение объёма на 30%. Тендинит лечится месяцами. Профилактика — вис 30-60 сек после каждой тренировки.</p></div>
-      <div class="info-block"><h4>📉 Deload каждые 4 недели</h4><p>После 3-й и 7-й недели — сделай объём 50-60% от обычного. Это не регресс, это стратегия — тело накопит ресурсы для нового роста.</p></div>
-      <div class="info-block"><h4>💧 Вода 2.5-3 л</h4><p>Обезвоженные мышцы забиваются моментально. Пей до, во время и после. С электролитами — лучше.</p></div>
-      <div class="info-block"><h4>😴 Сон 8-9 часов</h4><p>При ежедневной нагрузке без сна тело не успевает восстанавливаться. Тестостерон и ГР выделяются в глубоком сне. Без сна — нет прогресса.</p></div>
-      <div class="info-block"><h4>🧠 Привычка > мотивация</h4><p>В дни "не хочется" — сделай хотя бы разминку и 50% объёма. Главное не пропускать день. 30+ дней подряд = железная привычка.</p></div>
+      <div class="info-block"><h4>🔥 Разминка 5-10 мин</h4><p>Суставная гимнастика, махи, 2 подхода × 3-5 лёгких подтягиваний.</p></div>
+      <div class="info-block"><h4>🎯 Техника важнее цифр</h4><p>Полная амплитуда, без рывков. Чистые 8 > 12 грязных.</p></div>
+      <div class="info-block"><h4>⚡ Взрывные — свежим</h4><p>Высокие подтягивания, выходы — в начале тренировки.</p></div>
+      <div class="info-block"><h4>🧘 Слушай локти</h4><p>Если ноют — отдых 1-2 дня, -30% объёма. Профилактика — вис 30-60 сек после тренировки.</p></div>
+      <div class="info-block"><h4>💧 Вода 2.5-3 л</h4><p>Обезвоженные мышцы забиваются моментально.</p></div>
+      <div class="info-block"><h4>😴 Сон 8-9 часов</h4><p>Без сна нет прогресса.</p></div>
     </div>
   </div>
 
@@ -454,42 +460,23 @@
     <div class="space-y-2">
       <div class="info-block"><h4>Питание</h4>
         <ul>
-          <li><b>Калории:</b> 2500-2800 ккал (небольшой профицит)</li>
+          <li><b>Калории:</b> 2500-2800 ккал</li>
           <li><b>Белок:</b> 1.8-2.2 г/кг = 140-160 г</li>
-          <li><b>Углеводы:</b> 4-5 г/кг — топливо</li>
-          <li><b>Жиры:</b> 1 г/кг — гормоны</li>
-          <li>Приём пищи за 2ч до тренировки, белок+углеводы в течение часа после</li>
+          <li><b>Углеводы:</b> 4-5 г/кг</li>
+          <li><b>Жиры:</b> 1 г/кг</li>
         </ul>
       </div>
       <div class="info-block"><h4>Добавки</h4>
         <ul>
-          <li><b>Креатин</b> 5 г/день — сила, восстановление</li>
-          <li><b>Бета-аланин</b> 3-5 г — выносливость</li>
-          <li><b>Цитруллин</b> 6-8 г до тренировки — пампинг</li>
-          <li><b>Магний</b> 400 мг на ночь — расслабление</li>
+          <li><b>Креатин</b> 5 г/день</li>
+          <li><b>Бета-аланин</b> 3-5 г</li>
+          <li><b>Цитруллин</b> 6-8 г до тренировки</li>
+          <li><b>Магний</b> 400 мг на ночь</li>
           <li><b>Омега-3</b> 2-3 г/день</li>
           <li><b>Витамин D3</b> 2000-4000 МЕ</li>
         </ul>
       </div>
-      <div class="info-block"><h4>🚭 Алкоголь и курение</h4><p>Алкоголь <b>снижает синтез белка на 24-48ч</b>. Один вечер = 2 дня отката. При ежедневных тренировках это катастрофа. Курение — минус выносливость, хуже восстановление. Сведи к нулю, прогресс ускорится в 2-3 раза.</p></div>
-      <div class="info-block"><h4>Восстановление</h4>
-        <ul>
-          <li>Растяжка 10 мин после каждой тренировки</li>
-          <li>Массажный ролл 3 раза в неделю</li>
-          <li>Баня/сауна 1-2 раза</li>
-          <li>Контрастный душ после тренировки</li>
-          <li>Вис на турнике 30-60 сек после каждой тренировки — декомпрессия позвоночника</li>
-        </ul>
-      </div>
-      <div class="info-block"><h4>Режим</h4>
-        <ul>
-          <li>Тренировка в одно время (лучше утро/день)</li>
-          <li>Сон до 23:00, 8-9 часов</li>
-          <li>Взвешивание 1 раз в неделю утром</li>
-          <li>Тест максимумов раз в 2 недели</li>
-          <li>Фото 1 раз в месяц</li>
-        </ul>
-      </div>
+      <div class="info-block"><h4>🚭 Алкоголь и курение</h4><p>Алкоголь снижает синтез белка на 24-48ч. Курение — минус выносливость. Сведи к нулю.</p></div>
     </div>
   </div>
 </aside>
@@ -517,469 +504,457 @@
 </nav>
 
 <script>
-// ============== PROGRAM DATA ==============
-// Формат упражнения:
-// { name, cat: 'pull'|'push'|'legs'|'core'|'skill', scheme: "5×6-8", rest: 120, note: "", sets: N }
-// scheme парсится: "5×6-8" → 5 подходов по 6-8; "3×max" → 3 подхода макс; "3×30с" → статика
-
+// ============== PROGRAM ==============
 const PROGRAM = [
-  // ============ НЕДЕЛЯ 1 ============
   { week: 1, phase: "Фундамент", focus: "Объём, техника, восстановление связок", days: [
-    { key: "ПН", label: "Тяни · объём",
+    { key: "Д1", label: "Тяни · объём",
       exercises: [
-        { name: "Подтягивания обычный хват", cat: "pull", scheme: "5×6-8", rest: 120, note: "Хват на ширине плеч, лопатки вниз" },
-        { name: "Подтягивания широкий хват", cat: "pull", scheme: "4×5-6", rest: 120, note: "Шире плеч, акцент на верх спины" },
-        { name: "Подтягивания обратный хват", cat: "pull", scheme: "3×8-10", rest: 90, note: "Ладони к себе, бицепс" },
-        { name: "Австралийские подтягивания", cat: "pull", scheme: "3×12-15", rest: 60, note: "Горизонтальные, добивка спины" },
-        { name: "Вис на турнике", cat: "pull", scheme: "3×30-45с", rest: 45, note: "Хват и декомпрессия" },
-        { name: "Подъёмы коленей в висе", cat: "core", scheme: "3×12-15", rest: 60, note: "Пресс, без раскачки" }
+        { name: "Подтягивания обычный хват", cat: "pull", scheme: "5×6-8", rest: 120, note: "Хват на ширине плеч" },
+        { name: "Подтягивания широкий хват", cat: "pull", scheme: "4×5-6", rest: 120, note: "Шире плеч, верх спины" },
+        { name: "Подтягивания обратный хват", cat: "pull", scheme: "3×8-10", rest: 90, note: "Ладони к себе" },
+        { name: "Австралийские подтягивания", cat: "pull", scheme: "3×12-15", rest: 60, note: "Горизонтальные" },
+        { name: "Вис на турнике", cat: "pull", scheme: "3×30-45", rest: 45, note: "Хват и декомпрессия", time: true },
+        { name: "Подъёмы коленей в висе", cat: "core", scheme: "3×12-15", rest: 60, note: "Пресс" }
       ]},
-    { key: "ВТ", label: "Толкай · объём",
+    { key: "Д2", label: "Толкай · объём",
       exercises: [
         { name: "Брусья обычные", cat: "push", scheme: "5×8-10", rest: 120, note: "Корпус чуть вперёд" },
         { name: "Отжимания классические", cat: "push", scheme: "4×15-20", rest: 90, note: "Тело в линию" },
         { name: "Алмазные отжимания", cat: "push", scheme: "3×10-12", rest: 90, note: "Трицепс" },
-        { name: "Отжимания с ногами на возвышении", cat: "push", scheme: "3×12-15", rest: 90, note: "Верх груди" },
-        { name: "Планка", cat: "core", scheme: "3×60с", rest: 45, note: "Корпус ровный" },
-        { name: "L-sit попытки", cat: "core", scheme: "3×10-20с", rest: 60, note: "На брусьях или полу" }
+        { name: "Отжимания ноги на возвышении", cat: "push", scheme: "3×12-15", rest: 90, note: "Верх груди" },
+        { name: "Планка", cat: "core", scheme: "3×60", rest: 45, note: "Корпус ровный", time: true },
+        { name: "L-sit попытки", cat: "core", scheme: "3×10-20", rest: 60, note: "На брусьях", time: true }
       ]},
-    { key: "СР", label: "Ноги + кор",
+    { key: "Д3", label: "Ноги + кор",
       exercises: [
-        { name: "Приседания воздушные", cat: "legs", scheme: "5×20", rest: 60, note: "Пятки не отрывать" },
-        { name: "Выпады на месте", cat: "legs", scheme: "4×12 на ногу", rest: 60, note: "Колено почти касается пола" },
-        { name: "Болгарские приседания", cat: "legs", scheme: "3×10 на ногу", rest: 75, note: "Задняя нога на опоре" },
-        { name: "Приседания с паузой 2с", cat: "legs", scheme: "3×12", rest: 60, note: "В нижней точке пауза" },
-        { name: "Подъёмы на носки", cat: "legs", scheme: "3×25", rest: 45, note: "Полная амплитуда" },
-        { name: "Скручивания", cat: "core", scheme: "3×25", rest: 45, note: "Медленно, с контролем" },
-        { name: "Hollow body hold", cat: "core", scheme: "3×30с", rest: 45, note: "Поясница прижата" }
+        { name: "Приседания воздушные", cat: "legs", scheme: "5×20-25", rest: 60, note: "Пятки не отрывать" },
+        { name: "Выпады на месте", cat: "legs", scheme: "4×10-12", rest: 60, note: "На каждую ногу" },
+        { name: "Болгарские приседания", cat: "legs", scheme: "3×8-10", rest: 75, note: "На каждую ногу" },
+        { name: "Приседания с паузой 2с", cat: "legs", scheme: "3×10-12", rest: 60, note: "Пауза внизу" },
+        { name: "Подъёмы на носки", cat: "legs", scheme: "3×25-30", rest: 45, note: "Полная амплитуда" },
+        { name: "Скручивания", cat: "core", scheme: "3×20-25", rest: 45, note: "Медленно" },
+        { name: "Hollow body hold", cat: "core", scheme: "3×30-45", rest: 45, note: "Поясница прижата", time: true }
       ]},
-    { key: "ЧТ", label: "Техника · восстановление",
+    { key: "Д4", label: "Техника · восстановление",
       exercises: [
-        { name: "Подтягивания (разные хваты)", cat: "skill", scheme: "6×3-4", rest: 90, note: "Каждый подход — новый хват, свежо, без усталости" },
-        { name: "Брусья техника", cat: "skill", scheme: "5×5-6", rest: 90, note: "Идеальная форма, не до отказа" },
-        { name: "Мобильность плеч", cat: "skill", scheme: "1×10мин", rest: 0, note: "Растяжка, прокаты на ролле" },
-        { name: "Вис на турнике", cat: "pull", scheme: "3×45-60с", rest: 45, note: "Декомпрессия" }
+        { name: "Подтягивания разные хваты", cat: "skill", scheme: "6×3-4", rest: 90, note: "Каждый подход — новый хват" },
+        { name: "Брусья техника", cat: "skill", scheme: "5×5-6", rest: 90, note: "Идеальная форма" },
+        { name: "Мобильность плеч", cat: "skill", scheme: "1×10", rest: 0, note: "Растяжка, ролл", time: true },
+        { name: "Вис на турнике", cat: "pull", scheme: "3×45-60", rest: 45, note: "Декомпрессия", time: true }
       ]},
-    { key: "ПТ", label: "Тяни · выносливость",
+    { key: "Д5", label: "Тяни · выносливость",
       exercises: [
-        { name: "EMOM 12 мин: подтягивания", cat: "pull", scheme: "12×5", rest: 0, note: "Каждую минуту 5 подтягиваний, остаток — отдых. Хват обычный.", emom: { minutes: 12, reps: 5, exName: "подтягиваний" } },
-        { name: "EMOM 10 мин: австралийские", cat: "pull", scheme: "10×8", rest: 0, note: "8 австралийских каждую минуту", emom: { minutes: 10, reps: 8, exName: "австралийских" } },
-        { name: "Лесенка 1-10-1 обратный", cat: "pull", scheme: "1 сет", rest: 0, note: "1,2,3...10...3,2,1. Отдых = повторы×3с" },
-        { name: "Подъёмы прямых ног в висе", cat: "core", scheme: "3×10-12", rest: 60, note: "Без раскачки" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "12×5", rest: 0, note: "12 мин × 5 повт", emom: { minutes: 12, reps: 5 } },
+        { name: "EMOM австралийские", cat: "pull", scheme: "10×8", rest: 0, note: "10 мин × 8 повт", emom: { minutes: 10, reps: 8 } },
+        { name: "Лесенка 1-10-1 обратный", cat: "pull", scheme: "1×100", rest: 0, note: "Сумма 100 повт" },
+        { name: "Подъёмы ног в висе", cat: "core", scheme: "3×10-12", rest: 60, note: "Без раскачки" }
       ]},
-    { key: "СБ", label: "Толкай · выносливость",
+    { key: "Д6", label: "Толкай · выносливость",
       exercises: [
-        { name: "EMOM 12 мин: брусья", cat: "push", scheme: "12×7", rest: 0, note: "Каждую минуту 7 брусьев", emom: { minutes: 12, reps: 7, exName: "брусьев" } },
-        { name: "EMOM 10 мин: отжимания", cat: "push", scheme: "10×12", rest: 0, note: "12 отжиманий каждую минуту", emom: { minutes: 10, reps: 12, exName: "отжиманий" } },
-        { name: "Лесенка 1-20-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "Сумма 400 повт" },
-        { name: "Алмазные отжимания", cat: "push", scheme: "3×max", rest: 60, note: "Добивка трицепса" },
-        { name: "Планка", cat: "core", scheme: "3×60с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "12×7", rest: 0, note: "12 мин × 7 повт", emom: { minutes: 12, reps: 7 } },
+        { name: "EMOM отжимания", cat: "push", scheme: "10×12", rest: 0, note: "10 мин × 12 повт", emom: { minutes: 10, reps: 12 } },
+        { name: "Лесенка 1-20-1 отжиманий", cat: "push", scheme: "1×400", rest: 0, note: "Сумма 400" },
+        { name: "Алмазные отжимания", cat: "push", scheme: "3×8-12", rest: 60, note: "Добивка трицепса" },
+        { name: "Планка", cat: "core", scheme: "3×60", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Ноги + кондиционка",
+    { key: "Д7", label: "Ноги + кондиционка",
       exercises: [
-        { name: "Приседания", cat: "legs", scheme: "4×25", rest: 45, note: "Средний темп" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "4×10", rest: 60, note: "Взрывной подъём" },
-        { name: "Выпады ходьбой", cat: "legs", scheme: "3×20 шагов", rest: 60, note: "" },
-        { name: "Бёрпи", cat: "legs", scheme: "3×10", rest: 90, note: "Без отжимания, только прыжок" },
-        { name: "Суперсет пресс", cat: "core", scheme: "3×(20+30с)", rest: 60, note: "Скручивания + планка" }
+        { name: "Приседания", cat: "legs", scheme: "4×25-30", rest: 45, note: "Средний темп" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "4×8-10", rest: 60, note: "Взрывной подъём" },
+        { name: "Выпады ходьбой", cat: "legs", scheme: "3×20-24", rest: 60, note: "Шагов всего" },
+        { name: "Бёрпи", cat: "legs", scheme: "3×8-10", rest: 90, note: "Без отжимания" },
+        { name: "Суперсет пресс", cat: "core", scheme: "3×20", rest: 60, note: "Скруты + планка 30с" }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 2 ============
   { week: 2, phase: "Фундамент", focus: "Повышаем объём, закрепляем технику", days: [
-    { key: "ПН", label: "Тяни · объём",
+    { key: "Д1", label: "Тяни · объём",
       exercises: [
         { name: "Подтягивания обычный хват", cat: "pull", scheme: "5×7-9", rest: 120, note: "" },
         { name: "Подтягивания широкий хват", cat: "pull", scheme: "4×6-7", rest: 120, note: "" },
-        { name: "Подтягивания командо (разноимённый)", cat: "pull", scheme: "3×5-6 на сторону", rest: 90, note: "Боком, чередуй руки сверху" },
-        { name: "Обратный хват узкий", cat: "pull", scheme: "3×10-12", rest: 90, note: "Бицепс, брахиалис" },
-        { name: "Австралийские", cat: "pull", scheme: "3×15", rest: 60, note: "" },
-        { name: "Подъёмы коленей в висе", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "Подтягивания командо", cat: "pull", scheme: "3×5-6", rest: 90, note: "Разноимённый хват" },
+        { name: "Обратный узкий хват", cat: "pull", scheme: "3×10-12", rest: 90, note: "Бицепс" },
+        { name: "Австралийские", cat: "pull", scheme: "3×15-18", rest: 60, note: "" },
+        { name: "Подъёмы коленей", cat: "core", scheme: "4×12-15", rest: 60, note: "" }
       ]},
-    { key: "ВТ", label: "Толкай · объём",
+    { key: "Д2", label: "Толкай · объём",
       exercises: [
         { name: "Брусья", cat: "push", scheme: "5×10-12", rest: 120, note: "" },
-        { name: "Отжимания широким хватом", cat: "push", scheme: "4×15-20", rest: 90, note: "Грудь" },
+        { name: "Отжимания широким", cat: "push", scheme: "4×15-20", rest: 90, note: "Грудь" },
         { name: "Алмазные", cat: "push", scheme: "4×12-15", rest: 90, note: "" },
-        { name: "Отжимания с ногами на возвышении", cat: "push", scheme: "3×15", rest: 90, note: "" },
-        { name: "Отжимания узким хватом", cat: "push", scheme: "3×12-15", rest: 90, note: "Локти вдоль тела" },
-        { name: "L-sit", cat: "core", scheme: "4×15-25с", rest: 60, note: "" }
+        { name: "Отжимания ноги на возвышении", cat: "push", scheme: "3×12-15", rest: 90, note: "" },
+        { name: "Отжимания узким", cat: "push", scheme: "3×12-15", rest: 90, note: "Локти вдоль тела" },
+        { name: "L-sit", cat: "core", scheme: "4×15-25", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги + кор",
+    { key: "Д3", label: "Ноги + кор",
       exercises: [
-        { name: "Приседания", cat: "legs", scheme: "5×25", rest: 60, note: "" },
-        { name: "Болгарские", cat: "legs", scheme: "4×12 на ногу", rest: 75, note: "" },
-        { name: "Выпады ходьбой", cat: "legs", scheme: "3×24 шага", rest: 60, note: "" },
-        { name: "Приседания сумо", cat: "legs", scheme: "3×15", rest: 60, note: "Ноги широко, носки наружу" },
-        { name: "Подъёмы на носки", cat: "legs", scheme: "4×30", rest: 45, note: "" },
-        { name: "Hollow body", cat: "core", scheme: "4×40с", rest: 45, note: "" }
+        { name: "Приседания", cat: "legs", scheme: "5×25-30", rest: 60, note: "" },
+        { name: "Болгарские", cat: "legs", scheme: "4×10-12", rest: 75, note: "На каждую ногу" },
+        { name: "Выпады ходьбой", cat: "legs", scheme: "3×20-24", rest: 60, note: "" },
+        { name: "Приседания сумо", cat: "legs", scheme: "3×15-18", rest: 60, note: "" },
+        { name: "Подъёмы на носки", cat: "legs", scheme: "4×25-30", rest: 45, note: "" },
+        { name: "Hollow body", cat: "core", scheme: "4×40-50", rest: 45, note: "", time: true }
       ]},
-    { key: "ЧТ", label: "Техника + негативы",
+    { key: "Д4", label: "Техника + негативы",
       exercises: [
-        { name: "Подтягивания техника (разные хваты)", cat: "skill", scheme: "6×4", rest: 90, note: "Свежо" },
-        { name: "Негативные подтягивания 5с", cat: "pull", scheme: "4×3", rest: 120, note: "Только опускание, медленно" },
+        { name: "Подтягивания техника", cat: "skill", scheme: "6×4-5", rest: 90, note: "Разные хваты" },
+        { name: "Негативные подтягивания", cat: "pull", scheme: "4×3-4", rest: 120, note: "5с вниз" },
         { name: "Брусья техника", cat: "skill", scheme: "5×6-8", rest: 90, note: "" },
-        { name: "Высокий вис с уголком", cat: "core", scheme: "3×10-15с", rest: 60, note: "Подготовка к L-sit" },
-        { name: "Мобильность плеч + растяжка", cat: "skill", scheme: "1×15мин", rest: 0, note: "" }
+        { name: "Вис с уголком", cat: "core", scheme: "3×10-15", rest: 60, note: "Подготовка L-sit", time: true },
+        { name: "Мобильность плеч", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true }
       ]},
-    { key: "ПТ", label: "Тяни · выносливость",
+    { key: "Д5", label: "Тяни · выносливость",
       exercises: [
-        { name: "EMOM 15 мин: подтягивания", cat: "pull", scheme: "15×5", rest: 0, note: "75 повт за 15 мин", emom: { minutes: 15, reps: 5, exName: "подтягиваний" } },
-        { name: "EMOM 10 мин: обратный хват", cat: "pull", scheme: "10×4", rest: 0, note: "40 повт", emom: { minutes: 10, reps: 4, exName: "подтягиваний обратным" } },
-        { name: "Лесенка 1-12-1 обычный", cat: "pull", scheme: "1 сет", rest: 0, note: "144 повт" },
-        { name: "Подъёмы ног в висе", cat: "core", scheme: "4×12", rest: 60, note: "Прямые ноги" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "15×5", rest: 0, note: "75 повт", emom: { minutes: 15, reps: 5 } },
+        { name: "EMOM обратный хват", cat: "pull", scheme: "10×4", rest: 0, note: "40 повт", emom: { minutes: 10, reps: 4 } },
+        { name: "Лесенка 1-12-1 обычный", cat: "pull", scheme: "1×144", rest: 0, note: "144 повт" },
+        { name: "Подъёмы ног прямых", cat: "core", scheme: "4×10-12", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Толкай · выносливость",
+    { key: "Д6", label: "Толкай · выносливость",
       exercises: [
-        { name: "EMOM 15 мин: брусья", cat: "push", scheme: "15×8", rest: 0, note: "120 повт", emom: { minutes: 15, reps: 8, exName: "брусьев" } },
-        { name: "EMOM 12 мин: отжимания", cat: "push", scheme: "12×15", rest: 0, note: "180 повт", emom: { minutes: 12, reps: 15, exName: "отжиманий" } },
-        { name: "Лесенка 1-25-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "625 повт" },
-        { name: "Планка", cat: "core", scheme: "3×75с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "15×8", rest: 0, note: "120 повт", emom: { minutes: 15, reps: 8 } },
+        { name: "EMOM отжимания", cat: "push", scheme: "12×15", rest: 0, note: "180 повт", emom: { minutes: 12, reps: 15 } },
+        { name: "Лесенка 1-25-1 отжиманий", cat: "push", scheme: "1×625", rest: 0, note: "625 повт" },
+        { name: "Планка", cat: "core", scheme: "3×75-90", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Ноги + кондиционка",
+    { key: "Д7", label: "Ноги + кондиционка",
       exercises: [
-        { name: "Приседания", cat: "legs", scheme: "5×30", rest: 45, note: "" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "5×12", rest: 60, note: "" },
-        { name: "Выпады", cat: "legs", scheme: "4×14 на ногу", rest: 60, note: "" },
-        { name: "Бёрпи", cat: "legs", scheme: "4×12", rest: 90, note: "" },
-        { name: "Скалолаз", cat: "core", scheme: "3×40с", rest: 45, note: "" }
+        { name: "Приседания", cat: "legs", scheme: "5×30-35", rest: 45, note: "" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "5×10-12", rest: 60, note: "" },
+        { name: "Выпады", cat: "legs", scheme: "4×14-16", rest: 60, note: "На каждую ногу" },
+        { name: "Бёрпи", cat: "legs", scheme: "4×10-12", rest: 90, note: "" },
+        { name: "Скалолаз", cat: "core", scheme: "3×40-50", rest: 45, note: "", time: true }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 3 ============
   { week: 3, phase: "Взрыв", focus: "Взрывная сила, высокие подтягивания, негативы выходов", days: [
-    { key: "ПН", label: "Тяни · взрыв",
+    { key: "Д1", label: "Тяни · взрыв",
       exercises: [
-        { name: "Высокие подтягивания к груди", cat: "pull", scheme: "5×3-5", rest: 150, note: "ВЗРЫВ! Перекладина к груди. Свежим." },
+        { name: "Высокие к груди", cat: "pull", scheme: "5×3-5", rest: 150, note: "ВЗРЫВ! Перекладина к груди" },
         { name: "Подтягивания обычный", cat: "pull", scheme: "4×8-10", rest: 120, note: "" },
         { name: "Подтягивания широкий", cat: "pull", scheme: "4×6-8", rest: 120, note: "" },
-        { name: "Негативные выходы на две", cat: "skill", scheme: "5×2-3", rest: 150, note: "Запрыгни в упор → опускайся 5-7с через переход" },
-        { name: "Подъёмы ног прямых в висе", cat: "core", scheme: "4×12", rest: 60, note: "" }
+        { name: "Негативные выходы на две", cat: "skill", scheme: "5×2-3", rest: 150, note: "5-7с опускание" },
+        { name: "Подъёмы ног прямых", cat: "core", scheme: "4×10-12", rest: 60, note: "" }
       ]},
-    { key: "ВТ", label: "Толкай · взрыв",
+    { key: "Д2", label: "Толкай · взрыв",
       exercises: [
-        { name: "Взрывные отжимания с хлопком", cat: "push", scheme: "5×5-6", rest: 120, note: "Мощный толчок, хлопок, мягкое приземление" },
+        { name: "Взрывные хлопок", cat: "push", scheme: "5×5-6", rest: 120, note: "Мощный толчок" },
         { name: "Брусья", cat: "push", scheme: "5×10-12", rest: 120, note: "" },
-        { name: "Взрывные брусья", cat: "push", scheme: "4×5-6", rest: 120, note: "Отрыв ладоней в верхней точке" },
-        { name: "Отжимания с ногами на возвышении", cat: "push", scheme: "3×15", rest: 90, note: "" },
-        { name: "Негативы в стойке у стены", cat: "push", scheme: "3×3-4", rest: 120, note: "Подготовка к отжиманиям в стойке" },
-        { name: "L-sit", cat: "core", scheme: "4×20-30с", rest: 60, note: "" }
+        { name: "Брусья взрывные", cat: "push", scheme: "4×5-6", rest: 120, note: "Отрыв ладоней" },
+        { name: "Отжимания ноги на возвышении", cat: "push", scheme: "3×15-18", rest: 90, note: "" },
+        { name: "Негативы стойка у стены", cat: "push", scheme: "3×3-4", rest: 120, note: "5с вниз" },
+        { name: "L-sit", cat: "core", scheme: "4×20-30", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги · сила",
+    { key: "Д3", label: "Ноги · сила",
       exercises: [
-        { name: "Приседания с паузой 3с", cat: "legs", scheme: "5×10", rest: 90, note: "" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "5×10", rest: 75, note: "Максимальная высота" },
-        { name: "Болгарские", cat: "legs", scheme: "4×12 на ногу", rest: 75, note: "" },
-        { name: "Негативы пистолетика", cat: "legs", scheme: "3×3-4 на ногу", rest: 90, note: "Только опускание, с опорой" },
-        { name: "Подъёмы на носки", cat: "legs", scheme: "4×25", rest: 45, note: "" },
-        { name: "Пресс силовой", cat: "core", scheme: "4×20", rest: 45, note: "Подъёмы ног лёжа" }
+        { name: "Приседания с паузой 3с", cat: "legs", scheme: "5×8-10", rest: 90, note: "" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "5×8-10", rest: 75, note: "Максимальная высота" },
+        { name: "Болгарские", cat: "legs", scheme: "4×10-12", rest: 75, note: "На каждую ногу" },
+        { name: "Негативы пистолетика", cat: "legs", scheme: "3×3-4", rest: 90, note: "На каждую ногу" },
+        { name: "Подъёмы на носки", cat: "legs", scheme: "4×25-30", rest: 45, note: "" },
+        { name: "Подъёмы ног лёжа", cat: "core", scheme: "4×18-20", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Техника выходов",
+    { key: "Д4", label: "Техника выходов",
       exercises: [
-        { name: "Взрывные подтягивания", cat: "pull", scheme: "6×3", rest: 150, note: "Макс высота, каждый подход свежо" },
-        { name: "Негативные выходы на две", cat: "skill", scheme: "6×2", rest: 120, note: "5-7 сек опускание" },
-        { name: "Переход в упор с прыжка", cat: "skill", scheme: "5×3", rest: 120, note: "Запрыгни → удержи упор 3с → опустись" },
-        { name: "Брусья техника", cat: "push", scheme: "3×8-10", rest: 90, note: "Лёгкие, не до отказа" },
-        { name: "Мобильность плеч", cat: "skill", scheme: "1×15мин", rest: 0, note: "" }
+        { name: "Взрывные подтягивания", cat: "pull", scheme: "6×3-4", rest: 150, note: "Макс высота" },
+        { name: "Негативные выходы", cat: "skill", scheme: "6×2-3", rest: 120, note: "5-7 сек" },
+        { name: "Переход в упор с прыжка", cat: "skill", scheme: "5×3-4", rest: 120, note: "Удержи упор 3с" },
+        { name: "Брусья техника", cat: "push", scheme: "3×8-10", rest: 90, note: "Лёгкие" },
+        { name: "Мобильность плеч", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true }
       ]},
-    { key: "ПТ", label: "Тяни · плотность",
+    { key: "Д5", label: "Тяни · плотность",
       exercises: [
-        { name: "EMOM 15 мин: подтягивания", cat: "pull", scheme: "15×6", rest: 0, note: "90 повт", emom: { minutes: 15, reps: 6, exName: "подтягиваний" } },
-        { name: "EMOM 10 мин: высокий", cat: "pull", scheme: "10×2", rest: 0, note: "Взрывные, 20 повт", emom: { minutes: 10, reps: 2, exName: "высоких подтягиваний" } },
-        { name: "Лесенка 1-12-1 широкий", cat: "pull", scheme: "1 сет", rest: 0, note: "" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "15×6", rest: 0, note: "90 повт", emom: { minutes: 15, reps: 6 } },
+        { name: "EMOM высокий", cat: "pull", scheme: "10×2", rest: 0, note: "20 взрывных", emom: { minutes: 10, reps: 2 } },
+        { name: "Лесенка 1-12-1 широкий", cat: "pull", scheme: "1×144", rest: 0, note: "" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×12-15", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Толкай · плотность",
+    { key: "Д6", label: "Толкай · плотность",
       exercises: [
-        { name: "EMOM 15 мин: брусья", cat: "push", scheme: "15×9", rest: 0, note: "135 повт", emom: { minutes: 15, reps: 9, exName: "брусьев" } },
-        { name: "EMOM 12 мин: взрывные отжимания", cat: "push", scheme: "12×5", rest: 0, note: "", emom: { minutes: 12, reps: 5, exName: "взрывных отжиманий" } },
-        { name: "Лесенка 1-25-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "" },
-        { name: "Планка", cat: "core", scheme: "3×90с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "15×9", rest: 0, note: "135 повт", emom: { minutes: 15, reps: 9 } },
+        { name: "EMOM взрывные отжимания", cat: "push", scheme: "12×5", rest: 0, note: "60 повт", emom: { minutes: 12, reps: 5 } },
+        { name: "Лесенка 1-25-1 отжиманий", cat: "push", scheme: "1×625", rest: 0, note: "" },
+        { name: "Планка", cat: "core", scheme: "3×90-100", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Кондиционка",
+    { key: "Д7", label: "Кондиционка",
       exercises: [
-        { name: "Tabata приседания 4мин", cat: "legs", scheme: "8×20с", rest: 10, note: "20с работа / 10с отдых × 8" },
-        { name: "Прыжковые выпады", cat: "legs", scheme: "4×12 на ногу", rest: 75, note: "" },
-        { name: "Бёрпи", cat: "legs", scheme: "5×12", rest: 90, note: "" },
-        { name: "Скалолаз", cat: "core", scheme: "4×45с", rest: 45, note: "" },
-        { name: "Пресс суперсет", cat: "core", scheme: "3×(20+40с)", rest: 60, note: "Скруты + планка" }
+        { name: "Tabata приседания", cat: "legs", scheme: "8×20", rest: 10, note: "20с работа / 10с отдых × 8" },
+        { name: "Прыжковые выпады", cat: "legs", scheme: "4×10-12", rest: 75, note: "На каждую ногу" },
+        { name: "Бёрпи", cat: "legs", scheme: "5×10-12", rest: 90, note: "" },
+        { name: "Скалолаз", cat: "core", scheme: "4×45-60", rest: 45, note: "", time: true },
+        { name: "Пресс суперсет", cat: "core", scheme: "3×20", rest: 60, note: "Скруты + планка 40с" }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 4 ============
   { week: 4, phase: "Взрыв", focus: "Углубляем взрывную работу", days: [
-    { key: "ПН", label: "Тяни · взрыв",
+    { key: "Д1", label: "Тяни · взрыв",
       exercises: [
-        { name: "Высокие подтягивания к груди", cat: "pull", scheme: "6×3-4", rest: 150, note: "Цель: перекладина ниже сосков" },
+        { name: "Высокие к груди", cat: "pull", scheme: "6×3-4", rest: 150, note: "Ниже сосков" },
         { name: "Подтягивания обычный", cat: "pull", scheme: "5×8-10", rest: 120, note: "" },
         { name: "Подтягивания широкий", cat: "pull", scheme: "4×7-8", rest: 120, note: "" },
         { name: "Подтягивания обратный", cat: "pull", scheme: "3×10-12", rest: 90, note: "" },
-        { name: "Негативные выходы на две", cat: "skill", scheme: "6×2", rest: 150, note: "5-7 сек" },
-        { name: "Вис + уголок", cat: "core", scheme: "3×15-20с", rest: 60, note: "" }
+        { name: "Негативные выходы", cat: "skill", scheme: "6×2-3", rest: 150, note: "5-7 сек" },
+        { name: "Вис с уголком", cat: "core", scheme: "3×15-20", rest: 60, note: "", time: true }
       ]},
-    { key: "ВТ", label: "Толкай · взрыв",
+    { key: "Д2", label: "Толкай · взрыв",
       exercises: [
-        { name: "Взрывные отжимания хлопок", cat: "push", scheme: "6×5", rest: 120, note: "" },
+        { name: "Взрывные хлопок", cat: "push", scheme: "6×5-6", rest: 120, note: "" },
         { name: "Брусья", cat: "push", scheme: "5×12-15", rest: 120, note: "" },
-        { name: "Брусья взрывные", cat: "push", scheme: "4×6", rest: 120, note: "Отрыв ладоней" },
-        { name: "Отжимания в стойке у стены (негатив)", cat: "push", scheme: "4×3-4", rest: 150, note: "5 сек опускание" },
-        { name: "Алмазные", cat: "push", scheme: "3×max", rest: 60, note: "" },
-        { name: "L-sit", cat: "core", scheme: "4×25-35с", rest: 60, note: "" }
+        { name: "Брусья взрывные", cat: "push", scheme: "4×6-7", rest: 120, note: "" },
+        { name: "Отжимания в стойке (негатив)", cat: "push", scheme: "4×3-4", rest: 150, note: "5с опускание" },
+        { name: "Алмазные", cat: "push", scheme: "3×10-15", rest: 60, note: "" },
+        { name: "L-sit", cat: "core", scheme: "4×25-35", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги",
+    { key: "Д3", label: "Ноги",
       exercises: [
-        { name: "Приседания с паузой", cat: "legs", scheme: "5×12", rest: 90, note: "" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "6×10", rest: 75, note: "" },
-        { name: "Болгарские", cat: "legs", scheme: "4×14 на ногу", rest: 75, note: "" },
-        { name: "Негативы пистолетика", cat: "legs", scheme: "4×3-4 на ногу", rest: 90, note: "" },
-        { name: "Выпады прыжковые", cat: "legs", scheme: "3×10 на ногу", rest: 75, note: "" },
-        { name: "Пресс", cat: "core", scheme: "4×25", rest: 45, note: "" }
+        { name: "Приседания с паузой", cat: "legs", scheme: "5×10-12", rest: 90, note: "" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "6×10-12", rest: 75, note: "" },
+        { name: "Болгарские", cat: "legs", scheme: "4×12-14", rest: 75, note: "На ногу" },
+        { name: "Негативы пистолетика", cat: "legs", scheme: "4×3-4", rest: 90, note: "На ногу" },
+        { name: "Выпады прыжковые", cat: "legs", scheme: "3×8-10", rest: 75, note: "На ногу" },
+        { name: "Пресс", cat: "core", scheme: "4×20-25", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Техника выходов",
+    { key: "Д4", label: "Техника выходов",
       exercises: [
-        { name: "Взрывные к груди", cat: "pull", scheme: "6×3", rest: 150, note: "Свежо, макс высота" },
+        { name: "Взрывные к груди", cat: "pull", scheme: "6×3-4", rest: 150, note: "" },
         { name: "Негативные выходы", cat: "skill", scheme: "6×2-3", rest: 120, note: "" },
-        { name: "Удержание упора над перекладиной", cat: "skill", scheme: "5×5-10с", rest: 90, note: "Запрыгни и держи" },
-        { name: "Брусья лёгкие", cat: "push", scheme: "3×10", rest: 90, note: "" },
-        { name: "Мобильность + растяжка", cat: "skill", scheme: "1×15мин", rest: 0, note: "" }
+        { name: "Удержание упора", cat: "skill", scheme: "5×5-10", rest: 90, note: "Над перекладиной", time: true },
+        { name: "Брусья лёгкие", cat: "push", scheme: "3×10-12", rest: 90, note: "" },
+        { name: "Мобильность", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true }
       ]},
-    { key: "ПТ", label: "Тяни · EMOM",
+    { key: "Д5", label: "Тяни · EMOM",
       exercises: [
-        { name: "EMOM 18 мин: подтягивания", cat: "pull", scheme: "18×6", rest: 0, note: "108 повт", emom: { minutes: 18, reps: 6, exName: "подтягиваний" } },
-        { name: "EMOM 10 мин: высокий", cat: "pull", scheme: "10×3", rest: 0, note: "", emom: { minutes: 10, reps: 3, exName: "высоких" } },
-        { name: "Лесенка 1-14-1 обычный", cat: "pull", scheme: "1 сет", rest: 0, note: "196 повт" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "18×6", rest: 0, note: "108 повт, чередуй хваты", emom: { minutes: 18, reps: 6 } },
+        { name: "EMOM высокий", cat: "pull", scheme: "10×3", rest: 0, note: "30 взрывных", emom: { minutes: 10, reps: 3 } },
+        { name: "Лесенка 1-14-1 обычный", cat: "pull", scheme: "1×196", rest: 0, note: "196 повт" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×12-15", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Толкай · EMOM",
+    { key: "Д6", label: "Толкай · EMOM",
       exercises: [
-        { name: "EMOM 18 мин: брусья", cat: "push", scheme: "18×10", rest: 0, note: "180 повт", emom: { minutes: 18, reps: 10, exName: "брусьев" } },
-        { name: "EMOM 12 мин: взрывные отжимания", cat: "push", scheme: "12×6", rest: 0, note: "", emom: { minutes: 12, reps: 6, exName: "взрывных" } },
-        { name: "Лесенка 1-30-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "900 повт!" },
-        { name: "Планка", cat: "core", scheme: "3×90с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "18×10", rest: 0, note: "180 повт", emom: { minutes: 18, reps: 10 } },
+        { name: "EMOM взрывные отжимания", cat: "push", scheme: "12×6", rest: 0, note: "72 повт", emom: { minutes: 12, reps: 6 } },
+        { name: "Лесенка 1-30-1 отжиманий", cat: "push", scheme: "1×900", rest: 0, note: "900 повт!" },
+        { name: "Планка", cat: "core", scheme: "3×90-120", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Кондиционка",
+    { key: "Д7", label: "Кондиционка",
       exercises: [
-        { name: "Бёрпи AMRAP 10 мин", cat: "legs", scheme: "10 мин макс", rest: 0, note: "Сколько сможешь за 10 минут" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "5×15", rest: 60, note: "" },
-        { name: "Выпады прыжковые", cat: "legs", scheme: "4×12 на ногу", rest: 60, note: "" },
-        { name: "Скалолаз", cat: "core", scheme: "4×60с", rest: 45, note: "" },
-        { name: "Hollow body", cat: "core", scheme: "3×45с", rest: 45, note: "" }
+        { name: "Бёрпи AMRAP 10 мин", cat: "legs", scheme: "1×60-80", rest: 0, note: "Сколько сможешь" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "5×12-15", rest: 60, note: "" },
+        { name: "Выпады прыжковые", cat: "legs", scheme: "4×10-12", rest: 60, note: "На ногу" },
+        { name: "Скалолаз", cat: "core", scheme: "4×60", rest: 45, note: "", time: true },
+        { name: "Hollow body", cat: "core", scheme: "3×45-60", rest: 45, note: "", time: true }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 5 ============
   { week: 5, phase: "Выходы", focus: "Первые попытки выхода на две", days: [
-    { key: "ПН", label: "Тяни · выходы",
+    { key: "Д1", label: "Тяни · выходы",
       exercises: [
-        { name: "Выход на две (попытки)", cat: "skill", scheme: "8×1", rest: 180, note: "СВЕЖИМ! Каждая попытка на макс. Если не идёт — негативы" },
-        { name: "Высокие подтягивания", cat: "pull", scheme: "5×4", rest: 150, note: "" },
-        { name: "Подтягивания обычный", cat: "pull", scheme: "4×10", rest: 120, note: "" },
-        { name: "Негативные выходы", cat: "skill", scheme: "3×3", rest: 120, note: "5-7 сек" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "Выход на две (попытки)", cat: "skill", scheme: "8×1-2", rest: 180, note: "СВЕЖИМ! Если не идёт — негативы" },
+        { name: "Высокие подтягивания", cat: "pull", scheme: "5×3-4", rest: 150, note: "" },
+        { name: "Подтягивания обычный", cat: "pull", scheme: "4×10-12", rest: 120, note: "" },
+        { name: "Негативные выходы", cat: "skill", scheme: "3×3-4", rest: 120, note: "" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×12-15", rest: 60, note: "" }
       ]},
-    { key: "ВТ", label: "Толкай · сила",
+    { key: "Д2", label: "Толкай · сила",
       exercises: [
-        { name: "Брусья с паузой 2с", cat: "push", scheme: "5×8-10", rest: 120, note: "Пауза в нижней точке" },
+        { name: "Брусья с паузой 2с", cat: "push", scheme: "5×8-10", rest: 120, note: "Пауза внизу" },
         { name: "Взрывные отжимания", cat: "push", scheme: "5×6-8", rest: 120, note: "" },
-        { name: "Брусья обычные", cat: "push", scheme: "3×max", rest: 120, note: "Добивка" },
-        { name: "Отжимания в стойке у стены", cat: "push", scheme: "4×4-5", rest: 150, note: "Негативы или полные" },
-        { name: "L-sit", cat: "core", scheme: "4×30с", rest: 60, note: "" }
+        { name: "Брусья обычные", cat: "push", scheme: "3×15-20", rest: 120, note: "Добивка" },
+        { name: "Отжимания в стойке", cat: "push", scheme: "4×4-5", rest: 150, note: "" },
+        { name: "L-sit", cat: "core", scheme: "4×30-40", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги · сила",
+    { key: "Д3", label: "Ноги · сила",
       exercises: [
-        { name: "Пистолетик (попытки)", cat: "legs", scheme: "5×2-3 на ногу", rest: 120, note: "С опорой если надо" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "6×10", rest: 75, note: "" },
-        { name: "Болгарские", cat: "legs", scheme: "4×15 на ногу", rest: 75, note: "" },
-        { name: "Приседания с паузой", cat: "legs", scheme: "4×15", rest: 75, note: "" },
-        { name: "Выпады ходьбой", cat: "legs", scheme: "3×30 шагов", rest: 60, note: "" },
-        { name: "Пресс", cat: "core", scheme: "4×25", rest: 45, note: "" }
+        { name: "Пистолетик (попытки)", cat: "legs", scheme: "5×2-3", rest: 120, note: "На ногу, с опорой" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "6×10-12", rest: 75, note: "" },
+        { name: "Болгарские", cat: "legs", scheme: "4×12-15", rest: 75, note: "На ногу" },
+        { name: "Приседания с паузой", cat: "legs", scheme: "4×15-18", rest: 75, note: "" },
+        { name: "Выпады ходьбой", cat: "legs", scheme: "3×24-30", rest: 60, note: "Шагов" },
+        { name: "Пресс", cat: "core", scheme: "4×20-25", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Техника выходов",
+    { key: "Д4", label: "Техника выходов",
       exercises: [
-        { name: "Выход на две (попытки)", cat: "skill", scheme: "10×1", rest: 180, note: "Свежим, идеальная техника" },
-        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3", rest: 150, note: "" },
-        { name: "Прямые негативы выхода", cat: "skill", scheme: "4×2", rest: 120, note: "" },
-        { name: "Брусья техника", cat: "push", scheme: "3×10", rest: 90, note: "" },
-        { name: "Мобильность", cat: "skill", scheme: "1×15мин", rest: 0, note: "" }
+        { name: "Выход на две (попытки)", cat: "skill", scheme: "10×1-2", rest: 180, note: "Идеальная техника" },
+        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3-4", rest: 150, note: "" },
+        { name: "Прямые негативы", cat: "skill", scheme: "4×2-3", rest: 120, note: "" },
+        { name: "Брусья техника", cat: "push", scheme: "3×10-12", rest: 90, note: "" },
+        { name: "Мобильность", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true }
       ]},
-    { key: "ПТ", label: "Тяни · объём",
+    { key: "Д5", label: "Тяни · объём",
       exercises: [
-        { name: "EMOM 20 мин: подтягивания", cat: "pull", scheme: "20×6", rest: 0, note: "120 повт, чередуй хваты", emom: { minutes: 20, reps: 6, exName: "подтягиваний" } },
-        { name: "Лесенка 1-15-1 обычный", cat: "pull", scheme: "1 сет", rest: 0, note: "225 повт" },
-        { name: "Подтягивания обратный", cat: "pull", scheme: "3×max", rest: 90, note: "" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "20×6", rest: 0, note: "120 повт, чередуй хваты", emom: { minutes: 20, reps: 6 } },
+        { name: "Лесенка 1-15-1 обычный", cat: "pull", scheme: "1×225", rest: 0, note: "225 повт" },
+        { name: "Подтягивания обратный", cat: "pull", scheme: "3×12-15", rest: 90, note: "" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×15-18", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Толкай · объём",
+    { key: "Д6", label: "Толкай · объём",
       exercises: [
-        { name: "EMOM 20 мин: брусья", cat: "push", scheme: "20×10", rest: 0, note: "200 повт", emom: { minutes: 20, reps: 10, exName: "брусьев" } },
-        { name: "Лесенка 1-35-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "1225 повт!" },
-        { name: "Взрывные отжимания", cat: "push", scheme: "4×8", rest: 90, note: "" },
-        { name: "Планка", cat: "core", scheme: "3×120с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "20×10", rest: 0, note: "200 повт", emom: { minutes: 20, reps: 10 } },
+        { name: "Лесенка 1-35-1 отжиманий", cat: "push", scheme: "1×1225", rest: 0, note: "1225 повт!" },
+        { name: "Взрывные отжимания", cat: "push", scheme: "4×6-8", rest: 90, note: "" },
+        { name: "Планка", cat: "core", scheme: "3×120", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Кондиционка",
+    { key: "Д7", label: "Кондиционка",
       exercises: [
-        { name: "100 бёрпи на время", cat: "legs", scheme: "100 повт", rest: 0, note: "Засеки время" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "5×15", rest: 60, note: "" },
-        { name: "Выпады", cat: "legs", scheme: "4×16 на ногу", rest: 60, note: "" },
-        { name: "Скалолаз", cat: "core", scheme: "4×60с", rest: 45, note: "" }
+        { name: "100 бёрпи на время", cat: "legs", scheme: "1×100", rest: 0, note: "Засеки время" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "5×12-15", rest: 60, note: "" },
+        { name: "Выпады", cat: "legs", scheme: "4×16-20", rest: 60, note: "На ногу" },
+        { name: "Скалолаз", cat: "core", scheme: "4×60", rest: 45, note: "", time: true }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 6 ============
   { week: 6, phase: "Выходы", focus: "Серии выходов, работа с весом", days: [
-    { key: "ПН", label: "Тяни · сила",
+    { key: "Д1", label: "Тяни · сила",
       exercises: [
-        { name: "Выход на две", cat: "skill", scheme: "6×1-2", rest: 180, note: "Попробуй серии 2 подряд" },
-        { name: "Подтягивания +5кг", cat: "pull", scheme: "5×5", rest: 180, note: "Рюкзак с книгами/гиря" },
-        { name: "Подтягивания обычный", cat: "pull", scheme: "4×10", rest: 120, note: "" },
-        { name: "Подтягивания широкий", cat: "pull", scheme: "3×8", rest: 120, note: "" },
-        { name: "Негативные выходы", cat: "skill", scheme: "3×3", rest: 120, note: "" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "Выход на две", cat: "skill", scheme: "6×1-2", rest: 180, note: "Попробуй серии" },
+        { name: "Подтягивания +5кг", cat: "pull", scheme: "5×4-5", rest: 180, note: "Рюкзак/гиря" },
+        { name: "Подтягивания обычный", cat: "pull", scheme: "4×10-12", rest: 120, note: "" },
+        { name: "Подтягивания широкий", cat: "pull", scheme: "3×8-10", rest: 120, note: "" },
+        { name: "Негативные выходы", cat: "skill", scheme: "3×3-4", rest: 120, note: "" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×15-18", rest: 60, note: "" }
       ]},
-    { key: "ВТ", label: "Толкай · сила",
+    { key: "Д2", label: "Толкай · сила",
       exercises: [
         { name: "Брусья +5кг", cat: "push", scheme: "5×6-8", rest: 180, note: "" },
-        { name: "Взрывные отжимания хлопок", cat: "push", scheme: "5×6", rest: 120, note: "" },
-        { name: "Брусья обычные", cat: "push", scheme: "3×max", rest: 120, note: "" },
-        { name: "Отжимания в стойке у стены", cat: "push", scheme: "5×4-5", rest: 150, note: "" },
-        { name: "Алмазные", cat: "push", scheme: "3×max", rest: 60, note: "" },
-        { name: "L-sit", cat: "core", scheme: "4×35с", rest: 60, note: "" }
+        { name: "Взрывные хлопок", cat: "push", scheme: "5×5-6", rest: 120, note: "" },
+        { name: "Брусья обычные", cat: "push", scheme: "3×15-20", rest: 120, note: "" },
+        { name: "Отжимания в стойке", cat: "push", scheme: "5×4-5", rest: 150, note: "" },
+        { name: "Алмазные", cat: "push", scheme: "3×12-15", rest: 60, note: "" },
+        { name: "L-sit", cat: "core", scheme: "4×35-45", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги",
+    { key: "Д3", label: "Ноги",
       exercises: [
-        { name: "Пистолетик", cat: "legs", scheme: "6×3-4 на ногу", rest: 120, note: "С опорой при необходимости" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "6×12", rest: 75, note: "" },
-        { name: "Болгарские", cat: "legs", scheme: "4×15 на ногу", rest: 75, note: "" },
-        { name: "Приседания с паузой", cat: "legs", scheme: "4×20", rest: 75, note: "" },
-        { name: "Пресс", cat: "core", scheme: "5×25", rest: 45, note: "" }
+        { name: "Пистолетик", cat: "legs", scheme: "6×3-4", rest: 120, note: "На ногу" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "6×12-15", rest: 75, note: "" },
+        { name: "Болгарские", cat: "legs", scheme: "4×14-16", rest: 75, note: "На ногу" },
+        { name: "Приседания с паузой", cat: "legs", scheme: "4×18-20", rest: 75, note: "" },
+        { name: "Пресс", cat: "core", scheme: "5×20-25", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Техника",
+    { key: "Д4", label: "Техника",
       exercises: [
         { name: "Выход на две", cat: "skill", scheme: "10×1-2", rest: 180, note: "Свежо" },
-        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3", rest: 150, note: "" },
-        { name: "Удержание в упоре", cat: "skill", scheme: "4×10с", rest: 90, note: "Над перекладиной" },
-        { name: "Брусья", cat: "push", scheme: "3×12", rest: 90, note: "" }
+        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3-4", rest: 150, note: "" },
+        { name: "Удержание в упоре", cat: "skill", scheme: "4×10-15", rest: 90, note: "", time: true },
+        { name: "Брусья", cat: "push", scheme: "3×12-15", rest: 90, note: "" }
       ]},
-    { key: "ПТ", label: "Тяни · плотность",
+    { key: "Д5", label: "Тяни · плотность",
       exercises: [
-        { name: "EMOM 20 мин: подтягивания", cat: "pull", scheme: "20×7", rest: 0, note: "140 повт", emom: { minutes: 20, reps: 7, exName: "подтягиваний" } },
-        { name: "Лесенка 1-16-1 обычный", cat: "pull", scheme: "1 сет", rest: 0, note: "256 повт" },
-        { name: "Лесенка 1-10-1 широкий", cat: "pull", scheme: "1 сет", rest: 0, note: "" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "EMOM подтягивания", cat: "pull", scheme: "20×7", rest: 0, note: "140 повт", emom: { minutes: 20, reps: 7 } },
+        { name: "Лесенка 1-16-1 обычный", cat: "pull", scheme: "1×256", rest: 0, note: "256 повт" },
+        { name: "Лесенка 1-10-1 широкий", cat: "pull", scheme: "1×100", rest: 0, note: "" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×15-18", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Толкай · плотность",
+    { key: "Д6", label: "Толкай · плотность",
       exercises: [
-        { name: "EMOM 20 мин: брусья", cat: "push", scheme: "20×11", rest: 0, note: "220 повт", emom: { minutes: 20, reps: 11, exName: "брусьев" } },
-        { name: "Лесенка 1-40-1 отжиманий", cat: "push", scheme: "1 сет", rest: 0, note: "1600 повт" },
-        { name: "Взрывные отжимания", cat: "push", scheme: "4×8", rest: 90, note: "" },
-        { name: "Планка", cat: "core", scheme: "3×120с", rest: 45, note: "" }
+        { name: "EMOM брусья", cat: "push", scheme: "20×11", rest: 0, note: "220 повт", emom: { minutes: 20, reps: 11 } },
+        { name: "Лесенка 1-40-1 отжиманий", cat: "push", scheme: "1×1600", rest: 0, note: "1600 повт" },
+        { name: "Взрывные отжимания", cat: "push", scheme: "4×6-8", rest: 90, note: "" },
+        { name: "Планка", cat: "core", scheme: "3×120", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Кондиционка",
+    { key: "Д7", label: "Кондиционка",
       exercises: [
-        { name: "AMRAP 15 мин: 10 бёрпи+20 присед+30 скалолаз", cat: "legs", scheme: "15 мин", rest: 0, note: "Сколько кругов успеешь" },
-        { name: "Прыжковые выпады", cat: "legs", scheme: "4×14 на ногу", rest: 60, note: "" },
-        { name: "Пресс", cat: "core", scheme: "4×30", rest: 45, note: "" }
+        { name: "AMRAP 15 мин", cat: "legs", scheme: "1×10", rest: 0, note: "10 бёрпи+20 присед+30 скалолаз" },
+        { name: "Прыжковые выпады", cat: "legs", scheme: "4×12-14", rest: 60, note: "На ногу" },
+        { name: "Пресс", cat: "core", scheme: "4×25-30", rest: 45, note: "" }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 7 ============
-  { week: 7, phase: "Пик", focus: "Выходим на максимумы, серии выходов", days: [
-    { key: "ПН", label: "Тяни · сила",
+  { week: 7, phase: "Пик", focus: "Максимумы, серии выходов", days: [
+    { key: "Д1", label: "Тяни · сила",
       exercises: [
-        { name: "Подтягивания +8кг", cat: "pull", scheme: "5×4", rest: 180, note: "" },
-        { name: "Выход на две", cat: "skill", scheme: "5×2", rest: 180, note: "Сериями по 2!" },
-        { name: "Подтягивания +5кг", cat: "pull", scheme: "4×6", rest: 150, note: "" },
-        { name: "Высокие подтягивания", cat: "pull", scheme: "4×4", rest: 150, note: "" },
-        { name: "Подтягивания обычный", cat: "pull", scheme: "2×max", rest: 180, note: "Тест" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "Подтягивания +8кг", cat: "pull", scheme: "5×3-4", rest: 180, note: "" },
+        { name: "Выход на две", cat: "skill", scheme: "5×2-3", rest: 180, note: "Сериями!" },
+        { name: "Подтягивания +5кг", cat: "pull", scheme: "4×5-6", rest: 150, note: "" },
+        { name: "Высокие подтягивания", cat: "pull", scheme: "4×3-4", rest: 150, note: "" },
+        { name: "Подтягивания обычный макс", cat: "pull", scheme: "2×15-20", rest: 180, note: "Тест" },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×15-18", rest: 60, note: "" }
       ]},
-    { key: "ВТ", label: "Толкай · сила",
+    { key: "Д2", label: "Толкай · сила",
       exercises: [
-        { name: "Брусья +8кг", cat: "push", scheme: "5×5", rest: 180, note: "" },
-        { name: "Отжимания в стойке у стены", cat: "push", scheme: "5×5-6", rest: 150, note: "Полные!" },
-        { name: "Взрывные отжимания", cat: "push", scheme: "5×6", rest: 120, note: "" },
-        { name: "Брусья обычные", cat: "push", scheme: "2×max", rest: 180, note: "Тест" },
-        { name: "L-sit", cat: "core", scheme: "4×40с", rest: 60, note: "" }
+        { name: "Брусья +8кг", cat: "push", scheme: "5×4-5", rest: 180, note: "" },
+        { name: "Отжимания в стойке", cat: "push", scheme: "5×5-6", rest: 150, note: "" },
+        { name: "Взрывные отжимания", cat: "push", scheme: "5×6-7", rest: 120, note: "" },
+        { name: "Брусья обычные макс", cat: "push", scheme: "2×20-25", rest: 180, note: "Тест" },
+        { name: "L-sit", cat: "core", scheme: "4×40-50", rest: 60, note: "", time: true }
       ]},
-    { key: "СР", label: "Ноги · максимумы",
+    { key: "Д3", label: "Ноги · максимумы",
       exercises: [
-        { name: "Пистолетик", cat: "legs", scheme: "5×4-5 на ногу", rest: 120, note: "" },
-        { name: "Прыжковые приседания", cat: "legs", scheme: "6×15", rest: 75, note: "" },
-        { name: "Болгарские", cat: "legs", scheme: "4×20 на ногу", rest: 75, note: "" },
-        { name: "Приседания с паузой", cat: "legs", scheme: "4×25", rest: 75, note: "" },
-        { name: "Пресс", cat: "core", scheme: "5×30", rest: 45, note: "" }
+        { name: "Пистолетик", cat: "legs", scheme: "5×4-5", rest: 120, note: "На ногу" },
+        { name: "Прыжковые приседания", cat: "legs", scheme: "6×12-15", rest: 75, note: "" },
+        { name: "Болгарские", cat: "legs", scheme: "4×18-20", rest: 75, note: "На ногу" },
+        { name: "Приседания с паузой", cat: "legs", scheme: "4×20-25", rest: 75, note: "" },
+        { name: "Пресс", cat: "core", scheme: "5×25-30", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Выходы серии",
+    { key: "Д4", label: "Выходы серии",
       exercises: [
-        { name: "Выход на две серии", cat: "skill", scheme: "5×(2+1)", rest: 180, note: "2 выхода, отдых 30с, 1 выход" },
-        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3", rest: 150, note: "" },
-        { name: "Удержание в упоре 15с", cat: "skill", scheme: "4×15с", rest: 90, note: "" },
-        { name: "Брусья", cat: "push", scheme: "3×15", rest: 90, note: "" }
+        { name: "Выход на две серии", cat: "skill", scheme: "5×2-3", rest: 180, note: "2 выхода + отдых 30с + 1" },
+        { name: "Взрывные подтягивания", cat: "pull", scheme: "5×3-4", rest: 150, note: "" },
+        { name: "Удержание в упоре", cat: "skill", scheme: "4×15-20", rest: 90, note: "", time: true },
+        { name: "Брусья", cat: "push", scheme: "3×15-18", rest: 90, note: "" }
       ]},
-    { key: "ПТ", label: "100 подтягиваний",
+    { key: "Д5", label: "100 подтягиваний",
       exercises: [
-        { name: "100 подтягиваний на время", cat: "pull", scheme: "100 повт", rest: 0, note: "Разбей как хочешь: 10×10, 20-15-10-10-15-20-10, лесенка. Засеки время!" },
-        { name: "Отдых 10 мин", cat: "skill", scheme: "10мин", rest: 0, note: "" },
-        { name: "Подъёмы ног", cat: "core", scheme: "4×15", rest: 60, note: "" }
+        { name: "100 подтягиваний на время", cat: "pull", scheme: "1×100", rest: 0, note: "Разбей как хочешь. Засеки время!" },
+        { name: "Отдых", cat: "skill", scheme: "1×10", rest: 0, note: "", time: true },
+        { name: "Подъёмы ног", cat: "core", scheme: "4×15-18", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "100 брусьев + отжиманий",
+    { key: "Д6", label: "100 брусьев + отжиманий",
       exercises: [
-        { name: "100 брусьев на время", cat: "push", scheme: "100 повт", rest: 0, note: "Засеки время" },
-        { name: "Отдых 10 мин", cat: "skill", scheme: "10мин", rest: 0, note: "" },
-        { name: "100 отжиманий на время", cat: "push", scheme: "100 повт", rest: 0, note: "" },
-        { name: "Планка", cat: "core", scheme: "3×120с", rest: 45, note: "" }
+        { name: "100 брусьев на время", cat: "push", scheme: "1×100", rest: 0, note: "" },
+        { name: "Отдых", cat: "skill", scheme: "1×10", rest: 0, note: "", time: true },
+        { name: "100 отжиманий на время", cat: "push", scheme: "1×100", rest: 0, note: "" },
+        { name: "Планка", cat: "core", scheme: "3×120", rest: 45, note: "", time: true }
       ]},
-    { key: "ВС", label: "Кондиционка",
+    { key: "Д7", label: "Кондиционка",
       exercises: [
-        { name: "200 приседаний на время", cat: "legs", scheme: "200 повт", rest: 0, note: "" },
-        { name: "100 бёрпи", cat: "legs", scheme: "100 повт", rest: 0, note: "На время" },
-        { name: "Пресс", cat: "core", scheme: "5×30", rest: 45, note: "" }
+        { name: "200 приседаний", cat: "legs", scheme: "1×200", rest: 0, note: "На время" },
+        { name: "100 бёрпи", cat: "legs", scheme: "1×100", rest: 0, note: "На время" },
+        { name: "Пресс", cat: "core", scheme: "5×25-30", rest: 45, note: "" }
       ]}
   ]},
-  // ============ НЕДЕЛЯ 8 ============
   { week: 8, phase: "ФИНАЛ", focus: "Тест максимумов, возврат к КМС", days: [
-    { key: "ПН", label: "Тест подтягиваний",
+    { key: "Д1", label: "Тест подтягиваний",
       exercises: [
         { name: "Разминка", cat: "skill", scheme: "2×5-8", rest: 120, note: "Лёгкие подтягивания" },
-        { name: "🔥 МАКСИМУМ подтягиваний", cat: "pull", scheme: "1×max", rest: 0, note: "Твой новый рекорд! Цель: 25+" },
-        { name: "Отдых 15 мин", cat: "skill", scheme: "15мин", rest: 0, note: "" },
+        { name: "🔥 МАКСИМУМ подтягиваний", cat: "pull", scheme: "1×20-30", rest: 0, note: "Цель: 25+" },
+        { name: "Отдых", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true },
         { name: "Подтягивания +8кг", cat: "pull", scheme: "3×5-6", rest: 180, note: "" },
         { name: "Подтягивания +10кг", cat: "pull", scheme: "2×3-4", rest: 180, note: "Если идёт" }
       ]},
-    { key: "ВТ", label: "Тест брусьев",
+    { key: "Д2", label: "Тест брусьев",
       exercises: [
         { name: "Разминка", cat: "skill", scheme: "2×8-10", rest: 120, note: "" },
-        { name: "🔥 МАКСИМУМ брусьев", cat: "push", scheme: "1×max", rest: 0, note: "Цель: 35+" },
-        { name: "Отдых 15 мин", cat: "skill", scheme: "15мин", rest: 0, note: "" },
+        { name: "🔥 МАКСИМУМ брусьев", cat: "push", scheme: "1×30-40", rest: 0, note: "Цель: 35+" },
+        { name: "Отдых", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true },
         { name: "Брусья +10кг", cat: "push", scheme: "3×5-6", rest: 180, note: "" },
         { name: "Отжимания в стойке", cat: "push", scheme: "3×6-8", rest: 150, note: "" }
       ]},
-    { key: "СР", label: "Ноги · тест",
+    { key: "Д3", label: "Ноги · тест",
       exercises: [
-        { name: "Пистолетик МАКС", cat: "legs", scheme: "1×max на ногу", rest: 0, note: "Сколько чистых" },
-        { name: "100 прыжковых приседаний", cat: "legs", scheme: "100 повт", rest: 0, note: "На время" },
-        { name: "200 приседаний", cat: "legs", scheme: "200 повт", rest: 0, note: "" },
-        { name: "Пресс", cat: "core", scheme: "5×30", rest: 45, note: "" }
+        { name: "Пистолетик МАКС", cat: "legs", scheme: "1×8-12", rest: 0, note: "На ногу" },
+        { name: "100 прыжковых приседаний", cat: "legs", scheme: "1×100", rest: 0, note: "" },
+        { name: "200 приседаний", cat: "legs", scheme: "1×200", rest: 0, note: "" },
+        { name: "Пресс", cat: "core", scheme: "5×25-30", rest: 45, note: "" }
       ]},
-    { key: "ЧТ", label: "Тест выходов",
+    { key: "Д4", label: "Тест выходов",
       exercises: [
-        { name: "🔥 Выход на две МАКС", cat: "skill", scheme: "max серий", rest: 180, note: "Считай чистые выходы подряд. Цель: 3-5" },
-        { name: "Отдых 10 мин", cat: "skill", scheme: "10мин", rest: 0, note: "" },
-        { name: "Выход на две серии", cat: "skill", scheme: "5×2", rest: 150, note: "Если остались силы" },
-        { name: "Взрывные подтягивания", cat: "pull", scheme: "3×3", rest: 120, note: "" }
+        { name: "🔥 Выход на две МАКС", cat: "skill", scheme: "1×3-5", rest: 180, note: "Сериями подряд" },
+        { name: "Отдых", cat: "skill", scheme: "1×10", rest: 0, note: "", time: true },
+        { name: "Выход на две серии", cat: "skill", scheme: "5×2-3", rest: 150, note: "" },
+        { name: "Взрывные подтягивания", cat: "pull", scheme: "3×3-4", rest: 120, note: "" }
       ]},
-    { key: "ПТ", label: "Тест КМС",
+    { key: "Д5", label: "Тест КМС",
       exercises: [
-        { name: "🎯 Подтягивания +8кг МАКС", cat: "pull", scheme: "1×max", rest: 0, note: "Цель КМС: 18 повторений!" },
-        { name: "Отдых 15 мин", cat: "skill", scheme: "15мин", rest: 0, note: "" },
-        { name: "Подтягивания обычный МАКС", cat: "pull", scheme: "1×max", rest: 0, note: "Второй тест на выносливость" },
-        { name: "Подъёмы ног", cat: "core", scheme: "3×20", rest: 60, note: "" }
+        { name: "🎯 Подтягивания +8кг МАКС", cat: "pull", scheme: "1×15-20", rest: 0, note: "Цель КМС: 18!" },
+        { name: "Отдых", cat: "skill", scheme: "1×15", rest: 0, note: "", time: true },
+        { name: "Подтягивания обычный МАКС", cat: "pull", scheme: "1×20-30", rest: 0, note: "Тест выносливости" },
+        { name: "Подъёмы ног", cat: "core", scheme: "3×20-25", rest: 60, note: "" }
       ]},
-    { key: "СБ", label: "Финальный челлендж",
+    { key: "Д6", label: "Финальный челлендж",
       exercises: [
-        { name: "300 подтягиваний на время", cat: "pull", scheme: "300 повт", rest: 0, note: "Любыми хватами" },
-        { name: "300 отжиманий на время", cat: "push", scheme: "300 повт", rest: 0, note: "" },
-        { name: "300 приседаний на время", cat: "legs", scheme: "300 повт", rest: 0, note: "" }
+        { name: "300 подтягиваний", cat: "pull", scheme: "1×300", rest: 0, note: "Любыми хватами" },
+        { name: "300 отжиманий", cat: "push", scheme: "1×300", rest: 0, note: "" },
+        { name: "300 приседаний", cat: "legs", scheme: "1×300", rest: 0, note: "" }
       ]},
-    { key: "ВС", label: "Отдых + итоги",
+    { key: "Д7", label: "Отдых + итоги",
       exercises: [
-        { name: "Лёгкая растяжка", cat: "skill", scheme: "1×30мин", rest: 0, note: "Полное восстановление" },
-        { name: "Мобильность", cat: "skill", scheme: "1×20мин", rest: 0, note: "" },
-        { name: "Подведение итогов", cat: "skill", scheme: "—", rest: 0, note: "Запиши все результаты. Готов к новой программе!" }
+        { name: "Лёгкая растяжка", cat: "skill", scheme: "1×30", rest: 0, note: "", time: true },
+        { name: "Мобильность", cat: "skill", scheme: "1×20", rest: 0, note: "", time: true },
+        { name: "Подведение итогов", cat: "skill", scheme: "1×1", rest: 0, note: "Запиши результаты" }
       ]}
   ]}
 ];
@@ -992,6 +967,125 @@ const GOALS = [
   { text: "Пистолетик 5+ на ногу", val: "pistolMax", target: 5, unit: "раз" },
   { text: "30 дней без пропусков", val: "bestStreak", target: 30, unit: "дн" }
 ];
+
+// ============== UTILS ==============
+function parseScheme(scheme) {
+  if (!scheme) return { sets: 1, reps: '0', min: null, max: null, isRange: false, display: scheme };
+  const rangeMatch = scheme.match(/^(\d+)×(\d+)-(\d+)$/);
+  if (rangeMatch) {
+    return { sets: +rangeMatch[1], reps: `${rangeMatch[2]}-${rangeMatch[3]}`, min: +rangeMatch[2], max: +rangeMatch[3], isRange: true, display: scheme };
+  }
+  const singleMatch = scheme.match(/^(\d+)×(\d+)$/);
+  if (singleMatch) {
+    const n = +singleMatch[2];
+    return { sets: +singleMatch[1], reps: singleMatch[2], min: n, max: n, isRange: false, display: scheme };
+  }
+  const otherMatch = scheme.match(/^(\d+)×(.+)$/);
+  if (otherMatch) {
+    return { sets: +otherMatch[1], reps: otherMatch[2], min: null, max: null, isRange: false, display: scheme };
+  }
+  return { sets: 1, reps: scheme, min: null, max: null, isRange: false, display: scheme };
+}
+
+function isSetComplete(set, parsed) {
+  const n = parseInt(set.reps);
+  if (isNaN(n) || n <= 0) return false;
+  if (parsed.min !== null && parsed.max !== null) {
+    return n >= parsed.min && n <= parsed.max;
+  }
+  return true;
+}
+
+function getQuickRepButtons(parsed) {
+  if (parsed.isRange) {
+    return [
+      { label: '+1', value: 1, primary: false },
+      { label: `+${parsed.min}`, value: parsed.min, primary: false },
+      { label: `+${parsed.max}`, value: parsed.max, primary: true }
+    ];
+  }
+  const numMatch = parsed.reps.match(/^(\d+)$/);
+  if (numMatch) {
+    const n = +numMatch[1];
+    if (n >= 2 && n <= 30) {
+      return [{ label: '+1', value: 1, primary: false }, { label: `+${n}`, value: n, primary: true }];
+    }
+  }
+  return [
+    { label: '+1', value: 1, primary: false },
+    { label: '+5', value: 5, primary: false },
+    { label: '+10', value: 10, primary: true }
+  ];
+}
+
+// ============== CYCLE DATE LOGIC ==============
+function dateKey(d) {
+  const x = new Date(d); x.setHours(0,0,0,0);
+  return x.getTime();
+}
+
+function getWeekStartDate(weekIdx) {
+  // weekIdx 1..8
+  const start = new Date(state.startDate);
+  start.setHours(0,0,0,0);
+  start.setDate(start.getDate() + (weekIdx - 1) * 7);
+  return start;
+}
+
+function daysBetween(a, b) {
+  const A = new Date(a); A.setHours(0,0,0,0);
+  const B = new Date(b); B.setHours(0,0,0,0);
+  return Math.floor((B - A) / (24*3600*1000));
+}
+
+function getProgramDayNumber() {
+  // Сколько дней прошло с начала программы (1-based)
+  const today = new Date();
+  return daysBetween(state.startDate, today) + 1;
+}
+
+function getCurrentWeekFromStart() {
+  const day = getProgramDayNumber();
+  if (day < 1) return 1;
+  return Math.min(8, Math.ceil(day / 7));
+}
+
+function getNextDayIdx(weekIdx) {
+  const weekWorkouts = state.workoutsDone.filter(w => w.week === weekIdx);
+  const doneDayIdxs = weekWorkouts.map(w => w.dayIdx);
+  for (let i = 0; i < 7; i++) if (!doneDayIdxs.includes(i)) return i;
+  return -1;
+}
+
+function getWeekDayStatuses(weekIdx) {
+  const weekWorkouts = state.workoutsDone.filter(w => w.week === weekIdx);
+  const doneDayIdxs = weekWorkouts.map(w => w.dayIdx);
+  const weekStart = getWeekStartDate(weekIdx);
+  const today = new Date();
+  const daysSinceStart = daysBetween(weekStart, today); // 0 = первый день недели
+  
+  const isCurrentWeek = weekIdx === state.currentWeek;
+  const isPastWeek = weekIdx < state.currentWeek;
+  const isFutureWeek = weekIdx > state.currentWeek;
+  
+  const nextIdx = getNextDayIdx(weekIdx);
+  
+  return PROGRAM[weekIdx - 1].days.map((day, i) => {
+    if (doneDayIdxs.includes(i)) return 'done';
+    
+    if (isFutureWeek) return 'future';
+    
+    if (isPastWeek) {
+      // Вся прошлая неделя - если не выполнено, то пропущено
+      return 'missed';
+    }
+    
+    // Текущая неделя
+    if (nextIdx === i) return 'next';
+    if (i < daysSinceStart) return 'missed';
+    return 'future';
+  });
+}
 
 // ============== STATE ==============
 let state = loadState();
@@ -1009,13 +1103,13 @@ function defaultState() {
 }
 function loadState() {
   try {
-    const s = JSON.parse(localStorage.getItem('street_revival_v3'));
+    const s = JSON.parse(localStorage.getItem('street_revival_v5'));
     if (!s) return defaultState();
     const def = defaultState();
     return { ...def, ...s, profile: { ...def.profile, ...(s.profile || {}) } };
   } catch(e) { return defaultState(); }
 }
-function saveState() { localStorage.setItem('street_revival_v3', JSON.stringify(state)); }
+function saveState() { localStorage.setItem('street_revival_v5', JSON.stringify(state)); }
 
 function sameDay(a, b) {
   const d1 = new Date(a); d1.setHours(0,0,0,0);
@@ -1037,17 +1131,21 @@ function formatTime(sec) {
   const m = Math.floor(sec/60), s = sec%60;
   return `${m}:${String(s).padStart(2,'0')}`;
 }
-function parseScheme(scheme) {
-  // "5×6-8", "3×max", "3×30с", "1 сет", "100 повт", "10 мин", "1×max"
-  if (!scheme) return { sets: 0, reps: "0" };
-  const m = scheme.match(/^(\d+)×(.+)$/);
-  if (m) {
-    const sets = parseInt(m[1]);
-    const repsPart = m[2];
-    return { sets, reps: repsPart };
-  }
-  return { sets: 0, reps: scheme };
+function formatDate(d) {
+  const x = new Date(d);
+  return x.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
+function formatDateShort(d) {
+  const x = new Date(d);
+  return x.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+}
+function toISODate(d) {
+  const x = new Date(d);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+}
+
+const CAT_COLORS = { pull: '#00d4ff', push: '#00ff88', legs: '#ff8a00', core: '#b478ff', skill: '#ff3d81' };
+const DAY_NAMES = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
 
 // ============== NAV ==============
 function showPage(page) {
@@ -1090,48 +1188,60 @@ document.querySelectorAll('.back-btn').forEach(btn => {
 
 // ============== TODAY ==============
 function renderToday() {
+  // Sync currentWeek with elapsed time, but respect user progress
+  const expectedWeek = getCurrentWeekFromStart();
+  // Don't auto-advance if user has already progressed via workouts
+  // currentWeek is advanced when 7 workouts done
+  
   const week = PROGRAM[state.currentWeek - 1];
   document.getElementById('currentWeek').textContent = state.currentWeek;
   document.getElementById('phaseLabel').textContent = week.phase + ' · ' + week.focus;
   
+  // Program day
+  const programDay = Math.max(1, getProgramDayNumber());
+  document.getElementById('programDayBadge').textContent = `День ${programDay}`;
+  
+  // Week dates
+  const weekStart = getWeekStartDate(state.currentWeek);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+  document.getElementById('weekDates').textContent = `${formatDateShort(weekStart)} — ${formatDateShort(weekEnd)}`;
+  
   const weekWorkouts = state.workoutsDone.filter(w => w.week === state.currentWeek);
   const pct = (weekWorkouts.length / 7) * 100;
   document.getElementById('weekProgress').style.width = pct + '%';
-  document.getElementById('weekProgressLabel').textContent = `${weekWorkouts.length} из 7 дней`;
+  
+  const statuses = getWeekDayStatuses(state.currentWeek);
+  const missedCount = statuses.filter(s => s === 'missed').length;
+  let progressText = `${weekWorkouts.length} из 7 дней`;
+  if (missedCount > 0) progressText += ` · пропущено: ${missedCount}`;
+  document.getElementById('weekProgressLabel').textContent = progressText;
   
   const streak = computeStreak();
   document.getElementById('streakBadge').innerHTML = `🔥 ${streak}`;
   if (streak > state.profile.bestStreak) { state.profile.bestStreak = streak; saveState(); }
   
-  const days = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-  document.getElementById('greeting').textContent = days[new Date().getDay()];
+  document.getElementById('greeting').textContent = DAY_NAMES[new Date().getDay()];
   
-  const doneDayIdxs = weekWorkouts.map(w => w.dayIdx);
   const today = new Date();
   const todayDone = weekWorkouts.find(w => sameDay(new Date(w.date), today));
-  
-  let nextDayIdx = -1;
-  if (!todayDone) {
-    for (let i = 0; i < 7; i++) if (!doneDayIdxs.includes(i)) { nextDayIdx = i; break; }
-  }
+  const nextIdx = getNextDayIdx(state.currentWeek);
   
   const todayCard = document.getElementById('todayCard');
   const startBtn = document.getElementById('startBtn');
   
-  if (todayDone) {
-    const day = week.days[todayDone.dayIdx];
+  if (state.currentWeek > 8 || (weekWorkouts.length >= 7 && state.currentWeek === 8)) {
     todayCard.innerHTML = `
-      <div class="text-center py-2">
-        <div class="text-3xl mb-2">✅</div>
-        <div class="text-base font-bold mb-1">Сегодня выполнено</div>
-        <div class="text-xs text-gray-400 mb-3">${day.label} · ${todayDone.duration ? formatTime(todayDone.duration) : ''}</div>
-        <div class="text-xs text-gray-500">Отдыхай, завтра следующая тренировка</div>
+      <div class="text-center py-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <div class="text-lg font-bold gradient-text mb-1">Программа завершена!</div>
+        <div class="text-xs text-gray-400">Ты прошёл все 8 недель. Отличная работа!</div>
       </div>
     `;
-    startBtn.textContent = '✓ Сегодня готово';
+    startBtn.textContent = '🏆 Готово';
     startBtn.disabled = true;
     startBtn.style.opacity = '0.5';
-  } else if (weekWorkouts.length >= 7) {
+  } else if (todayDone && nextIdx === -1) {
+    // Неделя полностью сделана (все 7 тренировок)
     todayCard.innerHTML = `
       <div class="text-center py-2">
         <div class="text-3xl mb-2">🏆</div>
@@ -1139,45 +1249,77 @@ function renderToday() {
         <div class="text-xs text-gray-400">Переходим к неделе ${Math.min(state.currentWeek + 1, 8)}</div>
       </div>
     `;
-    startBtn.textContent = '🏆 Готово';
-    startBtn.disabled = true;
-    startBtn.style.opacity = '0.5';
-    if (state.currentWeek < 8) { state.currentWeek++; saveState(); setTimeout(renderToday, 500); return; }
-  } else if (nextDayIdx >= 0) {
-    const day = week.days[nextDayIdx];
-    const catColors = { pull: '#00d4ff', push: '#00ff88', legs: '#ff8a00', core: '#b478ff', skill: '#ff3d81' };
+    startBtn.textContent = '🏆 Перейти к след. неделе';
+    startBtn.disabled = false;
+    startBtn.style.opacity = '1';
+    startBtn.onclick = () => {
+      if (state.currentWeek < 8) {
+        state.currentWeek++;
+        saveState();
+        renderToday();
+      }
+    };
+    return;
+  } else if (todayDone && nextIdx >= 0) {
+    const day = week.days[todayDone.dayIdx];
+    const totalReps = todayDone.exercises.reduce((a, e) => a + e.sets.reduce((b, s) => b + (s.done ? (parseInt(s.reps)||0) : 0), 0), 0);
+    todayCard.innerHTML = `
+      <div class="text-center py-2">
+        <div class="text-3xl mb-2">✅</div>
+        <div class="text-base font-bold mb-1">Сегодня выполнено</div>
+        <div class="text-xs text-gray-400 mb-2">${day.label} · ${totalReps} повт · ${formatTime(todayDone.duration || 0)}</div>
+        <div class="mt-2 text-xs text-gray-500">Следующая тренировка: <span class="text-cyan-400 font-semibold">${week.days[nextIdx].label}</span></div>
+        <div class="text-[10px] text-gray-600 mt-1">Можешь сделать ещё сегодня или перенести на завтра</div>
+      </div>
+    `;
+    startBtn.textContent = `▶ Сделать ещё: ${week.days[nextIdx].key}`;
+    startBtn.disabled = false;
+    startBtn.style.opacity = '1';
+    startBtn.onclick = startWorkoutHandler;
+  } else if (nextIdx >= 0) {
+    const day = week.days[nextIdx];
+    const isMissed = statuses[nextIdx] === 'missed';
+    
     todayCard.innerHTML = `
       <div class="mb-3">
-        <div class="text-xs text-gray-500 mb-1">${day.key} · День ${nextDayIdx + 1}/7</div>
+        <div class="flex items-center gap-2 mb-1">
+          <div class="text-xs text-gray-500">${day.key} · Тренировка ${nextIdx + 1}/7</div>
+          ${isMissed ? '<span class="day-pill" style="background:rgba(255,61,92,0.15);color:#ff6b6b;font-size:9px;padding:2px 6px;">ДОЛГ</span>' : '<span class="day-pill" style="background:rgba(0,212,255,0.15);color:#00d4ff;font-size:9px;padding:2px 6px;">СЛЕДУЮЩАЯ</span>'}
+        </div>
         <div class="text-base font-bold mb-3">${day.label}</div>
         <div class="space-y-1.5">
           ${day.exercises.map(e => {
-            const c = catColors[e.cat] || '#fff';
+            const parsed = parseScheme(e.scheme);
+            const c = CAT_COLORS[e.cat] || '#fff';
             return `<div class="flex items-center gap-2 py-1.5 border-b border-white/5 last:border-0">
               <div class="w-1 h-8 rounded-full" style="background:${c};"></div>
               <div class="flex-1 min-w-0">
                 <div class="text-xs font-semibold truncate">${e.name}</div>
-                <div class="text-[10px] text-gray-500">${e.note ? e.note.substring(0, 40) : ''}</div>
+                <div class="text-[10px] text-gray-500">${e.note ? e.note.substring(0, 50) : ''}</div>
               </div>
-              <div class="text-xs font-bold whitespace-nowrap" style="color:${c};">${e.scheme}</div>
+              <div class="flex flex-col items-end">
+                <div class="text-xs font-bold whitespace-nowrap" style="color:${c};">${parsed.display}</div>
+                ${parsed.isRange ? `<div class="text-[9px] text-gray-500 mt-0.5">цель: ${parsed.min}-${parsed.max}</div>` : ''}
+              </div>
             </div>`;
           }).join('')}
         </div>
       </div>
     `;
-    startBtn.textContent = '▶ Начать тренировку';
+    startBtn.textContent = `▶ Начать тренировку`;
     startBtn.disabled = false;
     startBtn.style.opacity = '1';
+    startBtn.onclick = startWorkoutHandler;
   }
   
   // Week strip
   document.getElementById('weekStrip').innerHTML = week.days.map((day, idx) => {
-    const isDone = doneDayIdxs.includes(idx);
-    const isToday = idx === nextDayIdx && !todayDone && weekWorkouts.length < 7;
-    const cls = isDone ? 'gradient-bg text-[#0a0e1a]' : isToday ? 'orange-bg text-[#0a0e1a]' : day.exercises[0]?.cat === 'skill' ? 'bg-pink-500/20 text-pink-400' : 'bg-white/5 text-gray-500';
-    return `<div class="flex flex-col items-center gap-1 flex-shrink-0 w-12">
-      <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${cls}">${isDone ? '✓' : day.key}</div>
-      <div class="text-[9px] text-gray-500 text-center leading-tight" style="height:24px;">${day.label.split('·')[0].trim()}</div>
+    const status = statuses[idx];
+    const dotClass = status === 'done' ? 'done' : status === 'next' ? 'next' : status === 'missed' ? 'missed' : 'future';
+    const icon = status === 'done' ? '✓' : status === 'missed' ? '!' : (idx + 1);
+    return `<div class="flex flex-col items-center gap-1 flex-shrink-0 w-11">
+      <div class="day-dot ${dotClass}">${icon}</div>
+      <div class="text-[9px] text-gray-500 text-center leading-tight">${day.key}</div>
     </div>`;
   }).join('');
   
@@ -1198,7 +1340,7 @@ function renderToday() {
       const day = weekData?.days[w.dayIdx];
       const totalReps = w.exercises.reduce((a, e) => a + e.sets.reduce((b, s) => b + (s.done ? (parseInt(s.reps)||0) : 0), 0), 0);
       return `<div class="card-dark p-3 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg gradient-bg-soft flex items-center justify-center gradient-text text-sm font-bold">Н${w.week}</div>
+        <div class="w-9 h-9 rounded-lg gradient-bg flex items-center justify-center text-[#0a0e1a] text-xs font-bold">Н${w.week}</div>
         <div class="flex-1 min-w-0">
           <div class="text-xs font-semibold truncate">${day?.label || 'Тренировка'}</div>
           <div class="text-[10px] text-gray-500">${d.toLocaleDateString('ru-RU', {day:'numeric',month:'short'})} · ${totalReps} повт · ${formatTime(w.duration || 0)}</div>
@@ -1209,47 +1351,40 @@ function renderToday() {
 }
 
 // ============== START WORKOUT ==============
-document.getElementById('startBtn').addEventListener('click', () => {
-  const week = PROGRAM[state.currentWeek - 1];
+function startWorkoutHandler() {
   const weekWorkouts = state.workoutsDone.filter(w => w.week === state.currentWeek);
-  if (weekWorkouts.length >= 7) return;
+  const nextIdx = getNextDayIdx(state.currentWeek);
+  if (nextIdx === -1) {
+    // Week complete, advance
+    if (state.currentWeek < 8) {
+      state.currentWeek++;
+      saveState();
+      renderToday();
+    }
+    return;
+  }
   
-  const today = new Date();
-  if (weekWorkouts.find(w => sameDay(new Date(w.date), today))) return;
+  const week = PROGRAM[state.currentWeek - 1];
+  const day = week.days[nextIdx];
   
-  const doneDayIdxs = weekWorkouts.map(w => w.dayIdx);
-  let dayIdx = -1;
-  for (let i = 0; i < 7; i++) if (!doneDayIdxs.includes(i)) { dayIdx = i; break; }
-  if (dayIdx === -1) return;
-  
-  const day = week.days[dayIdx];
-  
-  // Build exercises with sets
   const exercises = day.exercises.map(e => {
     const parsed = parseScheme(e.scheme);
     let numSets = parsed.sets || 1;
-    if (numSets > 30) numSets = 1; // for "100 повт" etc
+    if (numSets > 30) numSets = 1;
     return {
-      name: e.name,
-      cat: e.cat,
-      scheme: e.scheme,
-      rest: e.rest || 90,
-      note: e.note,
-      emom: e.emom || null,
-      sets: Array.from({length: numSets}, () => ({ reps: '', done: false }))
+      name: e.name, cat: e.cat, scheme: e.scheme, parsed,
+      rest: e.rest || 90, note: e.note, time: e.time || false, emom: e.emom || null,
+      sets: Array.from({length: numSets}, () => ({ reps: '', done: false, timerStarted: false }))
     };
   });
   
   currentTraining = {
-    week: state.currentWeek,
-    dayIdx,
-    date: Date.now(),
-    label: day.label,
-    exercises
+    week: state.currentWeek, dayIdx: nextIdx, date: Date.now(),
+    label: day.label, dayKey: day.key, exercises
   };
   
   openWorkoutPage();
-});
+}
 
 // ============== WORKOUT PAGE ==============
 let workoutTimerInterval = null;
@@ -1259,20 +1394,27 @@ function openWorkoutPage() {
   showPage('workout');
   
   const t = currentTraining;
+  const statuses = getWeekDayStatuses(t.week);
+  const wasMissed = statuses[t.dayIdx] === 'missed';
+  
   document.getElementById('workoutHeader').innerHTML = `
-    <div class="text-xs text-gray-400 mb-1">Неделя ${t.week} · День ${t.dayIdx + 1}/7</div>
+    <div class="flex items-center gap-2 mb-1">
+      <div class="text-xs text-gray-400">Неделя ${t.week} · ${t.dayKey}</div>
+      ${wasMissed ? '<span class="day-pill" style="background:rgba(255,61,92,0.15);color:#ff6b6b;font-size:9px;padding:2px 6px;">ДОЛГ</span>' : ''}
+    </div>
     <div class="text-base font-bold">${t.label}</div>
+    ${wasMissed ? `<div class="text-[11px] text-gray-500 mt-1">Эта тренировка была пропущена. Закрываем долг.</div>` : ''}
   `;
   
-  // Show EMOM card if first exercise has emom
   const emomCard = document.getElementById('emomCard');
   const firstEmom = t.exercises.find(e => e.emom);
   if (firstEmom) {
     emomCard.classList.remove('hidden');
     document.getElementById('emomTitle').textContent = `Каждую минуту × ${firstEmom.emom.minutes} мин`;
-    document.getElementById('emomDesc').textContent = `${firstEmom.emom.reps} ${firstEmom.emom.exName} каждую минуту, остаток — отдых`;
+    document.getElementById('emomDesc').textContent = `${firstEmom.emom.reps} повт каждую минуту, остаток — отдых`;
     emomInterval = firstEmom.emom.minutes;
     emomReps = firstEmom.emom.reps;
+    emomRemaining = 0;
   } else {
     emomCard.classList.add('hidden');
   }
@@ -1291,107 +1433,161 @@ function openWorkoutPage() {
 function renderExercises() {
   const t = currentTraining;
   const list = document.getElementById('exerciseList');
-  const catColors = { pull: '#00d4ff', push: '#00ff88', legs: '#ff8a00', core: '#b478ff', skill: '#ff3d81' };
   
   list.innerHTML = t.exercises.map((ex, ei) => {
+    const parsed = ex.parsed;
     const doneSum = ex.sets.reduce((a, s) => a + (s.done ? (parseInt(s.reps)||0) : 0), 0);
-    const color = catColors[ex.cat] || '#fff';
+    const color = CAT_COLORS[ex.cat] || '#fff';
     const restLabel = ex.rest > 0 ? `💤 ${ex.rest}с` : '';
-    const quickReps = ex.cat === 'pull' ? [3,5,8,10] : ex.cat === 'push' ? [5,10,15,20] : ex.cat === 'legs' ? [10,15,20,25] : [5,10,15,20];
+    const unitLabel = ex.time ? 'сек' : 'повт';
+    const buttons = getQuickRepButtons(parsed);
+    const rangeHint = parsed.isRange ? ` · цель: ${parsed.min}-${parsed.max}` : (parsed.min === parsed.max && parsed.min ? ` · цель: ${parsed.min}` : '');
     
     return `
-      <div class="exercise-block ${ex.cat}" style="border-color:${color};">
+      <div class="exercise-block" style="border-color:${color};">
         <div class="flex items-start justify-between mb-2">
           <div class="flex-1 min-w-0">
             <div class="text-sm font-bold">${ex.name}</div>
-            <div class="text-[10px] text-gray-400 mt-0.5">${ex.scheme}${restLabel ? ' · ' + restLabel : ''}${ex.note ? ' · ' + ex.note : ''}</div>
+            <div class="text-[10px] text-gray-400 mt-0.5">
+              <span class="range-hint" style="background:${color}20;color:${color};">${parsed.display}</span>
+              ${restLabel ? ' · ' + restLabel : ''}
+              ${rangeHint}
+            </div>
+            ${ex.note ? `<div class="text-[10px] text-gray-500 mt-1">${ex.note}</div>` : ''}
           </div>
           <div class="text-right ml-2">
-            <div class="text-lg font-bold" style="color:${color};">${doneSum}</div>
-            <div class="text-[10px] text-gray-500">повт</div>
+            <div class="text-lg font-bold" style="color:${color};" data-sum-ei="${ei}">${doneSum}</div>
+            <div class="text-[10px] text-gray-500">${unitLabel}</div>
           </div>
         </div>
         <div class="space-y-1.5">
-          ${ex.sets.map((s, si) => `
-            <div class="set-row ${s.done ? 'done' : ''} card-dark p-2.5 flex items-center gap-2 rounded-xl">
+          ${ex.sets.map((s, si) => {
+            const complete = isSetComplete(s, parsed);
+            return `
+            <div class="set-row ${complete ? 'done' : ''} card-dark p-2.5 flex items-center gap-2 rounded-xl" data-row-ei="${ei}" data-row-si="${si}">
               <div class="w-5 text-[10px] text-gray-500 font-bold text-center">${si+1}</div>
               <input type="number" placeholder="0" 
                 value="${s.reps}"
                 data-ei="${ei}" data-si="${si}"
                 class="flex-1 min-w-0 bg-white/5 rounded-lg px-2 py-2 text-center text-sm font-bold focus:outline-none focus:ring-1 focus:ring-cyan-400">
               <div class="flex gap-1">
-                ${quickReps.map(r => `<button class="quick-rep" data-ei="${ei}" data-si="${si}" data-rep="${r}">+${r}</button>`).join('')}
+                ${buttons.map(b => `<button class="quick-rep ${b.primary ? 'primary' : ''}" data-ei="${ei}" data-si="${si}" data-rep="${b.value}">${b.label}</button>`).join('')}
               </div>
-              <button class="checkbox-circle" data-ei="${ei}" data-si="${si}">
-                ${s.done ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0e1a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
-              </button>
+              <div class="check-indicator ${complete ? 'active' : ''}" data-check-ei="${ei}" data-check-si="${si}">
+                ${complete ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0e1a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+              </div>
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
       </div>
     `;
   }).join('');
   
-  // Input handlers - only update state, don't rerender
   list.querySelectorAll('input[type="number"]').forEach(inp => {
     inp.addEventListener('input', (e) => {
       const ei = +e.target.dataset.ei, si = +e.target.dataset.si;
-      currentTraining.exercises[ei].sets[si].reps = e.target.value;
-      updateExerciseSum(ei);
-    });
-    inp.addEventListener('blur', () => {
-      // full rerender on blur to update done status if needed
+      const set = currentTraining.exercises[ei].sets[si];
+      const ex = currentTraining.exercises[ei];
+      const parsed = ex.parsed;
+      
+      const wasComplete = isSetComplete(set, parsed);
+      set.reps = e.target.value;
+      const nowComplete = isSetComplete(set, parsed);
+      
+      if (!wasComplete && nowComplete && !set.timerStarted && ex.rest > 0) {
+        set.timerStarted = true;
+        set.done = true;
+        startRestTimer(ex.rest);
+      } else if (nowComplete) {
+        set.done = true;
+      } else {
+        set.done = false;
+      }
+      
+      updateSetUI(ei, si);
     });
   });
   
-  // Quick rep buttons
   list.querySelectorAll('.quick-rep').forEach(btn => {
     btn.addEventListener('click', () => {
       const ei = +btn.dataset.ei, si = +btn.dataset.si, rep = +btn.dataset.rep;
       const set = currentTraining.exercises[ei].sets[si];
+      const ex = currentTraining.exercises[ei];
+      const parsed = ex.parsed;
+      
+      const wasComplete = isSetComplete(set, parsed);
       const current = parseInt(set.reps) || 0;
       set.reps = String(current + rep);
-      // update input
+      const nowComplete = isSetComplete(set, parsed);
+      
+      if (!wasComplete && nowComplete && !set.timerStarted && ex.rest > 0) {
+        set.timerStarted = true;
+        set.done = true;
+        startRestTimer(ex.rest);
+      } else if (nowComplete) {
+        set.done = true;
+      }
+      
       const input = list.querySelector(`input[data-ei="${ei}"][data-si="${si}"]`);
       if (input) input.value = set.reps;
-      updateExerciseSum(ei);
+      
+      updateSetUI(ei, si);
     });
   });
   
-  // Checkbox handlers
-  list.querySelectorAll('.checkbox-circle').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const ei = +btn.dataset.ei, si = +btn.dataset.si;
+  list.querySelectorAll('.check-indicator').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ei = +btn.dataset.checkEi, si = +btn.dataset.checkSi;
       const set = currentTraining.exercises[ei].sets[si];
-      set.done = !set.done;
+      const ex = currentTraining.exercises[ei];
       
-      if (set.done && !set.reps) {
-        const ex = currentTraining.exercises[ei];
-        const parsed = parseScheme(ex.scheme);
-        const suggested = parsed.reps.match(/\d+/) ? parsed.reps.match(/\d+/)[0] : '5';
-        set.reps = suggested;
+      if (!set.reps) {
+        set.reps = '1';
+        const input = list.querySelector(`input[data-ei="${ei}"][data-si="${si}"]`);
+        if (input) input.value = set.reps;
       }
       
-      renderExercises();
-      updateExerciseSum(ei);
-      
-      if (set.done && currentTraining.exercises[ei].rest > 0) {
-        startRestTimer(currentTraining.exercises[ei].rest);
+      const parsed = ex.parsed;
+      const wasComplete = isSetComplete(set, parsed);
+      if (!wasComplete) {
+        set.done = true;
+        set.timerStarted = true;
+        if (ex.rest > 0) startRestTimer(ex.rest);
+      } else {
+        set.done = !set.done;
       }
+      
+      updateSetUI(ei, si);
     });
   });
 }
 
-function updateExerciseSum(ei) {
+function updateSetUI(ei, si) {
   const ex = currentTraining.exercises[ei];
-  const doneSum = ex.sets.reduce((a, s) => a + (s.done ? (parseInt(s.reps)||0) : 0), 0);
-  // Find the element and update the number
-  const blocks = document.querySelectorAll('.exercise-block');
-  if (blocks[ei]) {
-    const numEl = blocks[ei].querySelector('.text-lg.font-bold');
-    if (numEl) numEl.textContent = doneSum;
+  const set = ex.sets[si];
+  const parsed = ex.parsed;
+  const complete = isSetComplete(set, parsed) || set.done;
+  
+  const row = document.querySelector(`[data-row-ei="${ei}"][data-row-si="${si}"]`);
+  if (row) {
+    if (complete) row.classList.add('done');
+    else row.classList.remove('done');
   }
+  
+  const check = document.querySelector(`[data-check-ei="${ei}"][data-check-si="${si}"]`);
+  if (check) {
+    if (complete) {
+      check.classList.add('active');
+      check.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0e1a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+      check.classList.remove('active');
+      check.innerHTML = '';
+    }
+  }
+  
+  const doneSum = ex.sets.reduce((a, s) => a + ((s.done || isSetComplete(s, parsed)) ? (parseInt(s.reps)||0) : 0), 0);
+  const sumEl = document.querySelector(`[data-sum-ei="${ei}"]`);
+  if (sumEl) sumEl.textContent = doneSum;
 }
 
 function exitWorkout() {
@@ -1406,51 +1602,44 @@ function finishWorkout() {
   clearInterval(workoutTimerInterval);
   const t = currentTraining;
   
-  state.workoutsDone.push({
-    date: t.date,
-    week: t.week,
-    dayIdx: t.dayIdx,
-    label: t.label,
-    duration: workoutElapsed,
-    exercises: t.exercises
+  t.exercises.forEach(ex => {
+    ex.sets.forEach(s => {
+      if (isSetComplete(s, ex.parsed)) s.done = true;
+    });
   });
   
-  // Update max pull
-  const pullMax = Math.max(...t.exercises.filter(e => e.cat === 'pull' && !/негатив|австралийск|высок|взрыв|выход/i.test(e.name))
-    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)), 0);
+  state.workoutsDone.push({
+    date: t.date, week: t.week, dayIdx: t.dayIdx, dayKey: t.dayKey,
+    label: t.label, duration: workoutElapsed, exercises: t.exercises
+  });
+  
+  const pullMax = Math.max(0, ...t.exercises.filter(e => e.cat === 'pull' && !/негатив|австралийск|высок|взрыв|выход/i.test(e.name))
+    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)));
   if (pullMax > state.profile.maxPull) state.profile.maxPull = pullMax;
   
-  // Update max dip
-  const dipMax = Math.max(...t.exercises.filter(e => e.cat === 'push' && /брусья/i.test(e.name) && !/взрыв|негатив/i.test(e.name))
-    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)), 0);
+  const dipMax = Math.max(0, ...t.exercises.filter(e => e.cat === 'push' && /брусья/i.test(e.name) && !/взрыв|негатив/i.test(e.name))
+    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)));
   if (dipMax > state.profile.maxDip) state.profile.maxDip = dipMax;
   
-  // Detect muscle up
   const hasMuscleUp = t.exercises.some(e => /выход на две/i.test(e.name) && e.sets.some(s => s.done && (parseInt(s.reps) || 0) >= 1));
   if (hasMuscleUp) state.profile.muscleUp = Math.max(state.profile.muscleUp, 1);
   
-  // Detect weighted pull +8
-  const weighted8 = Math.max(...t.exercises.filter(e => /подтягивания \+8кг/i.test(e.name))
-    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)), 0);
+  const weighted8 = Math.max(0, ...t.exercises.filter(e => /подтягивания \+8кг/i.test(e.name))
+    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)));
   if (weighted8 > state.profile.weightedPull8) state.profile.weightedPull8 = weighted8;
   
-  // Detect pistol
-  const pistol = Math.max(...t.exercises.filter(e => /пистолетик/i.test(e.name) && !/негатив/i.test(e.name))
-    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)), 0);
+  const pistol = Math.max(0, ...t.exercises.filter(e => /пистолетик/i.test(e.name) && !/негатив/i.test(e.name))
+    .flatMap(e => e.sets.filter(s => s.done).map(s => parseInt(s.reps) || 0)));
   if (pistol > state.profile.pistolMax) state.profile.pistolMax = pistol;
   
-  // Streak
   const streak = computeStreak();
   if (streak > state.profile.bestStreak) state.profile.bestStreak = streak;
-  
-  // Advance week
-  const weekDone = state.workoutsDone.filter(w => w.week === state.currentWeek).length;
-  if (weekDone >= 7 && state.currentWeek < 8) state.currentWeek++;
   
   currentTraining = null;
   saveState();
   
-  alert('🎉 Тренировка сохранена!');
+  const totalReps = t.exercises.reduce((a, e) => a + e.sets.filter(s => s.done).reduce((b, s) => b + (parseInt(s.reps)||0), 0), 0);
+  alert(`🎉 Тренировка сохранена!\n\n${t.dayKey} · ${t.label}\nВсего повторов: ${totalReps}\nВремя: ${formatTime(workoutElapsed)}`);
   showPage('today');
 }
 
@@ -1484,13 +1673,12 @@ function startRestTimer(seconds) {
   
   document.getElementById('timerStatus').textContent = 'Отдых';
   document.getElementById('timerMainBtn').textContent = 'Пауза';
-  saveState();
 }
 
 function updateTimerDisplay() {
   const m = Math.floor(restRemaining/60), s = restRemaining%60;
   const display = `${m}:${String(s).padStart(2,'0')}`;
-  document.getElementById('timerModal').textContent = display;
+  document.getElementById('timerModalDisp').textContent = display;
   document.getElementById('timerMini').textContent = display;
   
   const circ = 2 * Math.PI * 88;
@@ -1502,8 +1690,14 @@ function updateTimerDisplay() {
   document.getElementById('ringMini').style.strokeDashoffset = offsetMini;
 }
 
-function openTimerModal() { document.getElementById('timerModal').classList.remove('hidden'); document.getElementById('timerModal').classList.add('flex'); }
-function closeTimerModal() { document.getElementById('timerModal').classList.add('hidden'); document.getElementById('timerModal').classList.remove('flex'); }
+function openTimerModal() {
+  const m = document.getElementById('timerModal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeTimerModal() {
+  const m = document.getElementById('timerModal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
 
 document.getElementById('timerMainBtn').addEventListener('click', () => {
   if (restRunning) {
@@ -1516,6 +1710,7 @@ document.getElementById('timerMainBtn').addEventListener('click', () => {
     restRunning = true;
     document.getElementById('timerStatus').textContent = 'Отдых';
     document.getElementById('timerMainBtn').textContent = 'Пауза';
+    document.getElementById('floatingTimer').classList.remove('hidden');
     restTimerInterval = setInterval(() => {
       if (restRemaining <= 0) {
         clearInterval(restTimerInterval);
@@ -1569,11 +1764,11 @@ document.getElementById('emomBtn').addEventListener('click', () => {
     document.getElementById('emomBtn').textContent = '▶ Продолжить';
     return;
   }
-  emomRemaining = emomInterval * 60;
+  if (emomRemaining <= 0) emomRemaining = emomInterval * 60;
   emomRunning = true;
   document.getElementById('emomBtn').textContent = '⏸ Пауза';
   
-  let secondsInMinute = 60;
+  let secondsInMinute = emomRemaining % 60 || 60;
   emomTimerInterval = setInterval(() => {
     emomRemaining--;
     secondsInMinute--;
@@ -1583,13 +1778,13 @@ document.getElementById('emomBtn').addEventListener('click', () => {
     if (secondsInMinute <= 0) {
       secondsInMinute = 60;
       try { if ('vibrate' in navigator) navigator.vibrate([100,50,100]); } catch(e){}
-      if (emomRemaining <= 0) {
-        clearInterval(emomTimerInterval);
-        emomRunning = false;
-        document.getElementById('emomBtn').textContent = '✓ EMOM завершён';
-        document.getElementById('emomBtn').disabled = true;
-        document.getElementById('emomTime').textContent = '00:00';
-      }
+    }
+    if (emomRemaining <= 0) {
+      clearInterval(emomTimerInterval);
+      emomRunning = false;
+      document.getElementById('emomBtn').textContent = '✓ EMOM завершён';
+      document.getElementById('emomBtn').disabled = true;
+      document.getElementById('emomTime').textContent = '00:00';
     }
   }, 1000);
 });
@@ -1597,44 +1792,56 @@ document.getElementById('emomBtn').addEventListener('click', () => {
 // ============== PLAN ==============
 let planWeek = 1;
 function renderPlan() {
+  planWeek = state.currentWeek;
   const tabs = document.getElementById('weekTabs');
-  tabs.innerHTML = PROGRAM.map((w, i) => `
-    <button class="day-pill ${i+1 === state.currentWeek ? 'gradient-bg text-[#0a0e1a]' : 'bg-white/5 text-gray-400'}" data-week="${i+1}" style="${i+1 === state.currentWeek ? '' : 'padding:6px 12px;'}">
-      Н${i+1} · ${w.phase}
-    </button>
-  `).join('');
+  tabs.innerHTML = PROGRAM.map((w, i) => {
+    const weekStart = getWeekStartDate(i+1);
+    const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+    return `<button class="day-pill ${i+1 === planWeek ? 'gradient-bg text-[#0a0e1a]' : 'bg-white/5 text-gray-400'}" data-week="${i+1}">
+      Н${i+1} · ${formatDateShort(weekStart)}-${formatDateShort(weekEnd)}
+    </button>`;
+  }).join('');
   tabs.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      planWeek = +btn.dataset.week;
-      renderPlan();
-    });
+    btn.addEventListener('click', () => { planWeek = +btn.dataset.week; renderPlan(); });
   });
   
   const week = PROGRAM[planWeek - 1];
-  document.getElementById('planPhaseLabel').textContent = `Неделя ${planWeek} · ${week.phase} · ${week.focus}`;
+  const weekStart = getWeekStartDate(planWeek);
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
+  document.getElementById('planPhaseLabel').textContent = `Неделя ${planWeek} · ${week.phase} · ${formatDateShort(weekStart)} — ${formatDateShort(weekEnd)}`;
   
-  const weekWorkouts = state.workoutsDone.filter(w => w.week === planWeek);
-  const doneIdxs = weekWorkouts.map(w => w.dayIdx);
-  const catColors = { pull: '#00d4ff', push: '#00ff88', legs: '#ff8a00', core: '#b478ff', skill: '#ff3d81' };
+  const statuses = getWeekDayStatuses(planWeek);
   
   document.getElementById('planContent').innerHTML = week.days.map((day, i) => {
-    const isDone = doneIdxs.includes(i);
+    const status = statuses[i];
+    const dotClass = status === 'done' ? 'done' : status === 'next' ? 'next' : status === 'missed' ? 'missed' : 'future';
+    const icon = status === 'done' ? '✓' : status === 'missed' ? '!' : (i + 1);
+    const statusLabel = status === 'done' ? '<span class="text-[10px] text-green-400">✓ выполнено</span>' :
+                        status === 'missed' ? '<span class="text-[10px] text-red-400">пропущено (долг)</span>' :
+                        status === 'next' ? '<span class="text-[10px] text-orange-400">→ следующая</span>' : '';
+    const dayDate = new Date(weekStart); dayDate.setDate(dayDate.getDate() + i);
+    
     return `
       <div class="card p-3">
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'gradient-bg text-[#0a0e1a]' : 'bg-white/5 text-gray-400'}">${isDone ? '✓' : day.key}</div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="day-dot ${dotClass}">${icon}</div>
           <div class="flex-1">
             <div class="text-sm font-bold">${day.label}</div>
+            <div class="flex items-center gap-2">
+              <div class="text-[10px] text-gray-500">${formatDateShort(dayDate)}</div>
+              ${statusLabel}
+            </div>
           </div>
           <div class="text-xs text-gray-500">${day.exercises.length} упр.</div>
         </div>
-        <div class="space-y-1 ml-9">
+        <div class="space-y-1 ml-12">
           ${day.exercises.map(e => {
-            const c = catColors[e.cat] || '#fff';
+            const parsed = parseScheme(e.scheme);
+            const c = CAT_COLORS[e.cat] || '#fff';
             return `<div class="flex items-center gap-2 py-0.5 text-xs">
               <div class="w-0.5 h-4 rounded-full" style="background:${c};"></div>
               <div class="flex-1 text-gray-300 truncate">${e.name}</div>
-              <div class="text-gray-500 font-semibold whitespace-nowrap">${e.scheme}</div>
+              <div class="text-gray-500 font-semibold whitespace-nowrap">${parsed.display}</div>
             </div>`;
           }).join('')}
         </div>
@@ -1689,7 +1896,6 @@ function renderProgress() {
     options: chartOpts()
   });
   
-  // Goals
   document.getElementById('goalsList').innerHTML = GOALS.map(g => {
     const current = state.profile[g.val] || 0;
     const done = current >= g.target;
@@ -1730,6 +1936,13 @@ function renderProfile() {
   document.getElementById('inputMaxPull').value = state.profile.maxPull;
   document.getElementById('inputMaxDip').value = state.profile.maxDip;
   
+  // Cycle info
+  const programDay = Math.max(1, getProgramDayNumber());
+  document.getElementById('profileStartDate').textContent = formatDate(state.startDate);
+  document.getElementById('profileProgramDay').textContent = `День ${programDay}`;
+  document.getElementById('profileWeekInfo').textContent = `Неделя ${state.currentWeek} из 8 · Тренировок выполнено: ${state.workoutsDone.length}`;
+  document.getElementById('startDateInput').value = toISODate(state.startDate);
+  
   if (chartWeight) { chartWeight.destroy(); chartWeight = null; }
   const wrap = document.getElementById('chartWeightWrap');
   const empty = document.getElementById('emptyWeight');
@@ -1759,7 +1972,52 @@ function saveProfile() {
   state.profile.maxPull = +document.getElementById('inputMaxPull').value || 0;
   state.profile.maxDip = +document.getElementById('inputMaxDip').value || 0;
   saveState();
-  alert('✓ Сохранено');
+  alert('✓ Замеры сохранены');
+}
+
+document.getElementById('startCycleBtn').addEventListener('click', () => {
+  const hasProgress = state.workoutsDone.length > 0;
+  const msg = hasProgress
+    ? 'Начать цикл заново с сегодняшнего дня?\n\nВсе выполненные тренировки и прогресс по неделям будут сброшены. Замеры и дневник веса сохранятся.'
+    : 'Начать тренировочный цикл с сегодняшнего дня?';
+  
+  if (!confirm(msg)) return;
+  
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  state.startDate = today.getTime();
+  state.currentWeek = 1;
+  state.workoutsDone = [];
+  saveState();
+  alert('✓ Цикл запущен! Сегодня — День 1 программы.');
+  renderProfile();
+  renderToday();
+});
+
+function applyCustomStartDate() {
+  const inputVal = document.getElementById('startDateInput').value;
+  if (!inputVal) {
+    alert('Выбери дату в календаре');
+    return;
+  }
+  const parts = inputVal.split('-');
+  const newDate = new Date(+parts[0], +parts[1]-1, +parts[2]);
+  newDate.setHours(0,0,0,0);
+  
+  const hasProgress = state.workoutsDone.length > 0;
+  const msg = hasProgress
+    ? `Установить старт цикла на ${formatDate(newDate)}?\n\nВсе тренировки будут сброшены.`
+    : `Установить старт цикла на ${formatDate(newDate)}?`;
+  
+  if (!confirm(msg)) return;
+  
+  state.startDate = newDate.getTime();
+  state.currentWeek = 1;
+  state.workoutsDone = [];
+  saveState();
+  alert(`✓ Старт цикла: ${formatDate(newDate)}`);
+  renderProfile();
+  renderToday();
 }
 
 function logWeightToday() {
@@ -1775,8 +2033,8 @@ function logWeightToday() {
 }
 
 function resetProgress() {
-  if (!confirm('Удалить ВСЕ данные и начать заново?')) return;
-  localStorage.removeItem('street_revival_v3');
+  if (!confirm('Удалить ВСЕ данные (включая дату старта, тренировки, замеры) и начать заново?')) return;
+  localStorage.removeItem('street_revival_v5');
   location.reload();
 }
 
